@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Communication - Evelyn's Portfolio</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow-x: hidden;
+            color: #000;
+        }
+
+        /* =========================================
+           2. 统一导航 UI
+           ========================================= */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 100;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            mix-blend-mode: difference; /* 智能反色，适应黑白背景 */
+            color: white; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover {
+            opacity: 0.6;
+        }
+
+        /* 课程说明：改为顶部右侧 */
+        .project-intro {
+            position: fixed;
+            top: 40px;   /* 改为顶部 */
+            right: 40px; /* 改为右侧 */
+            z-index: 100;
+            font-size: 14px;
+            color: #666;
+            font-family: 'PuHuiTi', sans-serif;
+            opacity: 0.8;
+            mix-blend-mode: difference; /* 同样增加反色模式以适应深色背景 */
+            color: white; /* 配合 difference */
+        }
+
+        /* =========================================
+           3. 项目布局容器
+           ========================================= */
+        .section-container {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 5vw;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .project-info {
+            text-align: center;
+            margin-bottom: 60px;
+            z-index: 10;
+        }
+        .project-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .project-desc {
+            font-size: 16px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           Project 1: 罗马手表 (比较滑块)
+           ========================================= */
+        #project-watch {
+            background-color: #f9f9f9;
+        }
+
+        .compare-container {
+            position: relative;
+            width: 90vw;
+            max-width: 600px; 
+            aspect-ratio: 1410 / 2250; 
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            cursor: col-resize; 
+        }
+
+        .compare-img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .img-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            clip-path: inset(0 50% 0 0);
+            will-change: clip-path;
+        }
+
+        .slider-handle {
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: #fff;
+            z-index: 20;
+            pointer-events: none;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+        }
+        .slider-button {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* =========================================
+           Project 2: 个人 Logo (3D 悬浮)
+           ========================================= */
+        #project-logo {
+            background-color: #fff;
+            perspective: 1500px;
+        }
+
+        .tilt-card {
+            width: 90vw;
+            max-width: 600px;
+            aspect-ratio: 1410 / 2250; 
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+            transform-style: preserve-3d;
+            transform: rotateX(0) rotateY(0);
+            transition: transform 0.1s; 
+            position: relative;
+        }
+
+        .tilt-shine {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        /* =========================================
+           Project 3: 生存卡册 (点击发牌)
+           ========================================= */
+        #project-cards {
+            background-color: #1a1a1a; 
+            color: #fff;
+            overflow: hidden;
+        }
+        #project-cards .project-desc { color: #aaa; }
+
+        .deck-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin-top: 40px;
+            cursor: pointer;
+        }
+
+        .card {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 15px;
+            background-color: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 8px solid #fff;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
+            user-select: none;
+        }
+        
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .card.fly-out {
+            transition: transform 0.6s ease-in, opacity 0.6s ease-in;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .click-hint {
+            margin-top: 60px;
+            font-size: 14px;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100% {opacity: 0.5} 50% {opacity: 1} }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. 返回按钮 (统一样式) -->
+    <a href="index.html" class="nav-back">
+        <span>←</span> BACK TO HOME
+    </a>
+
+    <!-- 2. 课程说明 (已移动到右上角) -->
+    <div class="project-intro">
+        专业必修: 视觉传达
+    </div>
+
+    <!-- Project 1: 罗马手表 -->
+    <section class="section-container" id="project-watch">
+        <div class="project-info">
+            <div class="project-title">Watch Design</div>
+            <div class="project-desc">双色方案设计展示 · 左右滑动查看不同配色</div>
+        </div>
+
+        <div class="compare-container" id="compare-box">
+            <img src="assets/images/watch-bg.png" class="compare-img" alt="Watch Color B" onerror="this.src='https://placehold.co/1410x2250/333/FFF?text=Watch+Color+B+(Dark)'">
+            <div class="img-overlay" id="img-overlay">
+                <img src="assets/images/watch-bg-light.png" class="compare-img" alt="Watch Color A" onerror="this.src='https://placehold.co/1410x2250/EEE/333?text=Watch+Color+A+(Light)'">
+            </div>
+            <div class="slider-handle" id="slider-handle">
+                <div class="slider-button">↔</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Project 2: 个人 Logo -->
+    <section class="section-container" id="project-logo">
+        <div class="project-info">
+            <div class="project-title">Logo Design</div>
+            <div class="project-desc">Design & Applications · 悬浮交互</div>
+        </div>
+
+        <div class="tilt-card" id="tilt-card" style="background-image: url('assets/images/logo-board.png');">
+            <img src="assets/images/logo-board.png" style="display:none;" onerror="this.parentNode.style.backgroundImage='url(https://placehold.co/1410x2250/222/FFF?text=LOGO+BOARD+1410x2250)'">
+            <div class="tilt-shine"></div>
+        </div>
+    </section>
+
+
+    <!-- Project 3: 生存卡册 -->
+    <section class="section-container" id="project-cards">
+        <div class="project-info">
+            <div class="project-title">Information Visualization</div>
+            <div class="project-desc">大学生期末生存指南 · 点击“发牌”</div>
+        </div>
+
+        <div class="deck-container" id="deck">
+            <!-- HTML 顺序决定默认层级：最下面的元素在最顶层 -->
+            <div class="card">
+                <img src="assets/images/visual-07.png" alt="Page 7" onerror="this.src='https://placehold.co/350x350/a18cd1/FFF?text=Page+7'">
+            </div>
+            <div class="card">
+                <img src="assets/images/visual-06.png" alt="Page 6" onerror="this.src='https://placehold.co/350x350/fbc2eb/FFF?text=Page+6'">
+            </div>
+            <div class="card">
+                <img src="assets/images/visual-05.png" alt="Page 5" onerror="this.src='https://placehold.co/350x350/8fd3f4/FFF?text=Page+5'">
+            </div>
+            <div class="card">
+                <img src="assets/images/visual-04.png" alt="Page 4" onerror="this.src='https://placehold.co/350x350/e0c3fc/FFF?text=Page+4'">
+            </div>
+            <div class="card">
+                <img src="assets/images/visual-03.png" alt="Page 3" onerror="this.src='https://placehold.co/350x350/a8edea/FFF?text=Page+3'">
+            </div>
+            <div class="card">
+                <img src="assets/images/visual-02.png" alt="Page 2" onerror="this.src='https://placehold.co/350x350/fed6e3/FFF?text=Page+2'">
+            </div>
+            <div class="card">
+                <img src="assets/images/visual-01.png" alt="Cover" onerror="this.src='https://placehold.co/350x350/EEE/333?text=Cover+(Page+1)'">
+            </div>
+        </div>
+
+        <div class="click-hint">CLICK TO DEAL</div>
+    </section>
+
+
+    <script>
+        // ================================
+        // 1. 罗马手表：滑动对比逻辑
+        // ================================
+        const compareBox = document.getElementById('compare-box');
+        const overlay = document.getElementById('img-overlay');
+        const handle = document.getElementById('slider-handle');
+
+        const updateSlider = (x) => {
+            const rect = compareBox.getBoundingClientRect();
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+            const percentage = (x / rect.width) * 100;
+            const clipValue = 100 - percentage;
+            overlay.style.clipPath = `inset(0 ${clipValue}% 0 0)`;
+            handle.style.left = `${percentage}%`;
+        };
+
+        compareBox.addEventListener('mousemove', (e) => {
+            const rect = compareBox.getBoundingClientRect();
+            updateSlider(e.clientX - rect.left);
+        });
+
+        compareBox.addEventListener('touchmove', (e) => {
+            const rect = compareBox.getBoundingClientRect();
+            updateSlider(e.touches[0].clientX - rect.left);
+        });
+
+
+        // ================================
+        // 2. Logo：3D 悬浮视差
+        // ================================
+        const card = document.getElementById('tilt-card');
+        const shine = card.querySelector('.tilt-shine');
+
+        document.getElementById('project-logo').addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - (rect.left + rect.width / 2);
+            const y = e.clientY - (rect.top + rect.height / 2);
+            const rotateY = x / 25; 
+            const rotateX = -y / 25; 
+
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            shine.style.opacity = '1';
+            shine.style.background = `linear-gradient(${135 + x/5}deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 80%)`;
+        });
+
+        document.getElementById('project-logo').addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0) rotateY(0) scale(1)`;
+            shine.style.opacity = '0';
+        });
+
+
+        // ================================
+        // 3. 生存卡册：点击发牌
+        // ================================
+        const deck = document.getElementById('deck');
+        const cards = Array.from(deck.querySelectorAll('.card'));
+        
+        cards.forEach((c, index) => {
+            const randomRot = (Math.random() - 0.5) * 8; 
+            c.style.transform = `rotate(${randomRot}deg)`;
+            c.style.zIndex = index; 
+            
+            c.addEventListener('click', function(e) {
+                e.stopPropagation();
+                throwCard(this);
+            });
+        });
+
+        function throwCard(cardEl) {
+            const randomX = (Math.random() - 0.5) * 800 + (Math.random() > 0.5 ? 200 : -200);
+            const randomY = (Math.random() - 0.5) * 300;
+            const randomRot = (Math.random() - 0.5) * 90;
+
+            cardEl.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRot}deg)`;
+            cardEl.classList.add('fly-out');
+
+            setTimeout(() => {
+                cardEl.style.transition = 'none';
+                cardEl.classList.remove('fly-out');
+                cardEl.style.transform = `scale(0.8)`;
+                cardEl.style.opacity = '0'; 
+                
+                deck.prepend(cardEl);
+                
+                setTimeout(() => {
+                    cardEl.style.transition = 'transform 0.3s, opacity 0.3s';
+                    cardEl.style.opacity = '1';
+                    cardEl.style.transform = `rotate(${(Math.random() - 0.5) * 8}deg)`;
+                    resetZIndexes();
+                }, 50);
+            }, 600);
+        }
+
+        function resetZIndexes() {
+            const currentCards = deck.querySelectorAll('.card');
+            currentCards.forEach((c, i) => {
+                c.style.zIndex = i;
+            });
+        }
+
+    </script>
+</body>
+</html>

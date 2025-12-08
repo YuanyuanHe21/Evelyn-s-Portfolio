@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comics & Others - Evelyn's Portfolio</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0; /* 浅灰底色 */
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow: hidden; /* 隐藏原生滚动条 */
+            height: 100vh;
+            width: 100vw;
+            user-select: none; 
+            cursor: grab; 
+        }
+
+        body.is-dragging {
+            cursor: grabbing; 
+        }
+
+        /* =========================================
+           2. 导航 UI
+           ========================================= */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 100;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            mix-blend-mode: difference;
+            color: white; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover {
+            opacity: 0.6;
+        }
+
+        .page-indicator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            font-size: 14px;
+            color: #888;
+            font-family: 'InstrumentSans-Regular', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .scroll-hint {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 100;
+            font-size: 14px;
+            color: #000;
+            opacity: 0.4;
+        }
+
+        /* 新增：左下角课程说明 */
+        .project-intro {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            z-index: 100;
+            font-size: 14px;
+            color: #666;
+            font-family: 'PuHuiTi', sans-serif;
+            opacity: 0.8;
+        }
+
+        /* =========================================
+           3. 核心画廊容器
+           ========================================= */
+        .gallery-viewport {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .gallery-track {
+            display: flex;
+            align-items: center;
+            gap: 10vw; 
+            padding-left: 15vw; 
+            padding-right: 15vw; 
+            will-change: transform; 
+        }
+
+        /* 漫画单页 */
+        .comic-item {
+            position: relative;
+            flex-shrink: 0;
+            height: 70vh; 
+            width: auto;  
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            transition: transform 0.1s; 
+            background: #fff;
+        }
+
+        .comic-item img {
+            height: 100%;
+            width: auto;
+            display: block;
+            pointer-events: none; 
+        }
+
+        /* 漫画编号 */
+        .comic-number {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            font-size: 120px;
+            font-family: 'BebasNeue', sans-serif;
+            color: rgba(0,0,0,0.05);
+            line-height: 1;
+            z-index: -1;
+        }
+
+        /* 漫画标题/描述 */
+        .comic-info {
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            width: 100%;
+        }
+        .comic-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .comic-desc {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #000;
+            width: 0%; 
+            z-index: 200;
+            transition: width 0.1s linear;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. 返回按钮 -->
+    <a href="index.html" class="nav-back">
+        <span>←</span> BACK TO HOME
+    </a>
+
+    <!-- 2. 底部进度条 -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- 3. 页码指示器 -->
+    <div class="page-indicator">
+        <span id="current-index">01</span> / <span id="total-count">06</span>
+    </div>
+
+    <!-- 4. 滚动提示 (右下) -->
+    <div class="scroll-hint">DRAG or SCROLL</div>
+
+    <!-- 5. 课程说明 (左下) -->
+    <div class="project-intro">
+        专业选修:视觉叙事
+    </div>
+
+    <!-- 6. 画廊主体 -->
+    <div class="gallery-viewport">
+        <div class="gallery-track" id="track">
+            
+            <!-- 漫画 Item 1 -->
+            <div class="comic-item">
+                <span class="comic-number">01</span>
+                <img src="assets/images/comic-01.PNG" alt="Comic 1" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+01'">
+                <div class="comic-info">
+                    <div class="comic-title">起因 / The Beginning</div>
+                    <div class="comic-desc">Visual Narrative Assignment</div>
+                </div>
+            </div>
+
+            <!-- 漫画 Item 2 -->
+            <div class="comic-item">
+                <span class="comic-number">02</span>
+                <img src="assets/images/comic-02.PNG" alt="Comic 2" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+02'">
+                <div class="comic-info">
+                    <div class="comic-title">发展 / Development</div>
+                </div>
+            </div>
+
+            <!-- 漫画 Item 3 -->
+            <div class="comic-item">
+                <span class="comic-number">03</span>
+                <img src="assets/images/comic-03.PNG" alt="Comic 3" onerror="this.src='https://placehold.co/900x700/EEE/31343C?text=COMIC+PAGE+03'">
+                <div class="comic-info">
+                    <div class="comic-title">冲突 / Conflict</div>
+                </div>
+            </div>
+
+            <!-- 漫画 Item 4 -->
+            <div class="comic-item">
+                <span class="comic-number">04</span>
+                <img src="assets/images/comic-04.PNG" alt="Comic 4" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+04'">
+                <div class="comic-info">
+                    <div class="comic-title">高潮 / Climax</div>
+                </div>
+            </div>
+
+            <!-- 漫画 Item 5 -->
+            <div class="comic-item">
+                <span class="comic-number">05</span>
+                <img src="assets/images/comic-05.PNG" alt="Comic 5" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+05'">
+                <div class="comic-info">
+                    <div class="comic-title">转折 / Turning Point</div>
+                </div>
+            </div>
+
+            <!-- 漫画 Item 6 -->
+            <div class="comic-item">
+                <span class="comic-number">06</span>
+                <img src="assets/images/comic-06.PNG" alt="Comic 6" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+06'">
+                <div class="comic-info">
+                    <div class="comic-title">结局 / The End</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 7. 物理引擎脚本 -->
+    <script>
+        const track = document.getElementById('track');
+        const progressBar = document.getElementById('progress-bar');
+        const currentIdxEl = document.getElementById('current-index');
+        const totalCountEl = document.getElementById('total-count');
+        const items = document.querySelectorAll('.comic-item');
+
+        totalCountEl.innerText = items.length.toString().padStart(2, '0');
+
+        let state = {
+            currentX: 0,      
+            targetX: 0,       
+            isDragging: false,
+            startX: 0,
+            dragStartX: 0,
+            maxScroll: 0      
+        };
+
+        const config = {
+            lerp: 0.08,       
+            skewStrength: 0.15, 
+            wheelSpeed: 1.2   
+        };
+
+        function updateDimensions() {
+            const trackWidth = track.scrollWidth;
+            const windowWidth = window.innerWidth;
+            state.maxScroll = -(trackWidth - windowWidth);
+            
+            if (state.targetX < state.maxScroll) state.targetX = state.maxScroll;
+            if (state.targetX > 0) state.targetX = 0;
+        }
+
+        window.addEventListener('resize', updateDimensions);
+        window.addEventListener('load', updateDimensions);
+
+        window.addEventListener('wheel', (e) => {
+            state.targetX -= e.deltaY * config.wheelSpeed;
+            clampTarget();
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            state.isDragging = true;
+            state.startX = e.clientX;
+            state.dragStartX = state.targetX;
+            document.body.classList.add('is-dragging');
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!state.isDragging) return;
+            const diff = e.clientX - state.startX;
+            state.targetX = state.dragStartX + diff * 1.5; 
+        });
+
+        window.addEventListener('mouseup', () => {
+            state.isDragging = false;
+            document.body.classList.remove('is-dragging');
+            clampTarget(); 
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            state.isDragging = true;
+            state.startX = e.touches[0].clientX;
+            state.dragStartX = state.targetX;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!state.isDragging) return;
+            const diff = e.touches[0].clientX - state.startX;
+            state.targetX = state.dragStartX + diff * 1.5;
+        });
+
+        window.addEventListener('touchend', () => {
+            state.isDragging = false;
+            clampTarget();
+        });
+
+        function clampTarget() {
+            if (state.targetX > 0) state.targetX = 0;
+            if (state.targetX < state.maxScroll) state.targetX = state.maxScroll;
+        }
+
+        function animate() {
+            state.currentX += (state.targetX - state.currentX) * config.lerp;
+            const velocity = state.targetX - state.currentX;
+            const skew = velocity * config.skewStrength;
+            
+            track.style.transform = `translate3d(${state.currentX}px, 0, 0)`;
+            
+            items.forEach(item => {
+                item.style.transform = `skewX(${skew}deg)`;
+            });
+
+            if (state.maxScroll !== 0) {
+                const progress = (state.currentX / state.maxScroll) * 100;
+                progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+                
+                const totalWidth = Math.abs(state.maxScroll);
+                const currentPos = Math.abs(state.currentX);
+                const idx = Math.min(items.length, Math.ceil((currentPos / totalWidth) * items.length) || 1);
+                currentIdxEl.innerText = idx.toString().padStart(2, '0');
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        updateDimensions();
+        animate();
+
+    </script>
+</body>
+</html>
