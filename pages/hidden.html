@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graveyard of Drafts - 废稿公墓</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('../assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('../assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* 黑色背景 */
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            /* 添加过渡动画，用于页面退出 */
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        /* 页面下滑退出的动画类 (对应主页的上滑退出) */
+        body.slide-down-out {
+            transform: translateY(100vh);
+        }
+
+        /* 导航栏 */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 100;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: white; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        /* 声音开关按钮 */
+        .sound-toggle {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 100;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+        .sound-toggle:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.8);
+        }
+
+        /* 顶部标题 */
+        .header-title {
+            text-align: center;
+            padding-top: 100px;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 10;
+        }
+        .header-title h1 {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 64px;
+            letter-spacing: 4px;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        .header-title p {
+            font-size: 16px;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        /* =========================================
+           2. 幽灵动效
+           ========================================= */
+        .ghost-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* 不挡鼠标 */
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .ghost {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.3;
+            filter: blur(1px);
+            animation: float-ghost 10s infinite linear;
+        }
+
+        @keyframes float-ghost {
+            0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.4; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-100px) translateX(50px) rotate(20deg); opacity: 0; }
+        }
+
+        /* =========================================
+           3. 瀑布流布局
+           ========================================= */
+        .masonry-grid {
+            column-count: 4; /* 4列 */
+            column-gap: 20px;
+            padding: 0 40px 100px;
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (max-width: 1200px) { .masonry-grid { column-count: 3; } }
+        @media (max-width: 800px) { .masonry-grid { column-count: 2; } }
+        @media (max-width: 500px) { .masonry-grid { column-count: 1; } }
+
+        .grid-item {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+            z-index: 20;
+        }
+
+        .grid-item img {
+            width: 100%;
+            display: block;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .grid-item:hover img { opacity: 1; }
+
+        .item-info {
+            padding: 15px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .item-title { font-weight: bold; color: #fff; margin-bottom: 5px; }
+
+        /* 墓碑标记 */
+        .tombstone-mark {
+            position: absolute;
+            top: 10px; right: 10px;
+            font-size: 20px;
+            opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. 返回按钮 -->
+    <a href="../index.html" class="nav-back">
+        <span>↑</span> BACK TO LIFE
+    </a>
+
+    <!-- 2. 声音开关 -->
+    <button id="sound-btn" class="sound-toggle">🔇</button>
+
+    <!-- 3. 背景音乐 -->
+    <audio id="bgm" src="../assets/audio/graveyard.mp3" loop></audio>
+
+    <!-- 4. 幽灵背景 -->
+    <div class="ghost-container" id="ghost-bg">
+        <!-- JS生成幽灵 -->
+    </div>
+
+    <!-- 5. 标题 -->
+    <div class="header-title">
+        <h1>GRAVEYARD OF DRAFTS</h1>
+        <p>这里埋葬着那些死去的创意与无处安放的脑洞</p>
+    </div>
+
+    <!-- 6. 废稿展示区 (瀑布流) -->
+    <div class="masonry-grid">
+        
+        <!-- Item 1 -->
+        <div class="grid-item">
+            <span class="tombstone-mark">🪦</span>
+            <img src="https://placehold.co/400x600/222/666?text=Rejected+Logo+V1" alt="Draft">
+            <div class="item-info">
+                <div class="item-title">被毙掉的 Logo 方案一</div>
+                <div>甲方说这看起来像个煎蛋</div>
+            </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="grid-item">
+            <span class="tombstone-mark">👻</span>
+            <img src="https://placehold.co/400x300/333/777?text=Crazy+Doodle" alt="Draft">
+            <div class="item-info">
+                <div class="item-title">凌晨3点的涂鸦</div>
+                <div>当时觉得自己是个天才，醒来发现是疯子</div>
+            </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="grid-item">
+            <span class="tombstone-mark">⚰️</span>
+            <img src="https://placehold.co/400x500/2a2a2a/888?text=Unfinished+Poster" alt="Draft">
+            <div class="item-info">
+                <div class="item-title">未完成的海报</div>
+                <div>画到一半软件崩了，遂弃之</div>
+            </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="grid-item">
+            <span class="tombstone-mark">🥀</span>
+            <img src="https://placehold.co/400x400/111/555?text=Glitch+Art" alt="Draft">
+            <div class="item-info">
+                <div class="item-title">Glitch 尝试</div>
+                <div>纯粹的宣泄</div>
+            </div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="grid-item">
+            <span class="tombstone-mark">🦴</span>
+            <img src="https://placehold.co/400x700/1f1f1f/999?text=Character+Sketch" alt="Draft">
+            <div class="item-info">
+                <div class="item-title">角色草图</div>
+                <div>太丑了，没敢放进作品集</div>
+            </div>
+        </div>
+
+        <!-- Item 6 -->
+        <div class="grid-item">
+            <span class="tombstone-mark">🌫️</span>
+            <img src="https://placehold.co/400x350/222/666?text=Random+Shape" alt="Draft">
+            <div class="item-info">
+                <div class="item-title">不知名物体</div>
+                <div>???</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 动态生成背景幽灵
+        const ghostContainer = document.getElementById('ghost-bg');
+        const ghosts = ['👻', '💀', '☠️', '😶‍🌫️', '🕯️'];
+
+        function createGhost() {
+            const el = document.createElement('div');
+            el.classList.add('ghost');
+            el.innerText = ghosts[Math.floor(Math.random() * ghosts.length)];
+            
+            // 随机位置和动画参数
+            const left = Math.random() * 100;
+            const duration = 10 + Math.random() * 10; // 10-20s
+            const delay = Math.random() * 5;
+            const size = 20 + Math.random() * 40;
+
+            el.style.left = `${left}%`;
+            el.style.animationDuration = `${duration}s`;
+            el.style.animationDelay = `-${delay}s`; 
+            el.style.fontSize = `${size}px`;
+
+            ghostContainer.appendChild(el);
+        }
+
+        for(let i=0; i<15; i++) {
+            createGhost();
+        }
+
+        // ============================
+        // 音乐控制逻辑
+        // ============================
+        const bgm = document.getElementById('bgm');
+        const soundBtn = document.getElementById('sound-btn');
+        let isPlaying = false;
+
+        // 尝试播放函数
+        function tryPlayMusic() {
+            bgm.volume = 0.4; // 音量调小一点，不要太吓人
+            bgm.play().then(() => {
+                isPlaying = true;
+                soundBtn.innerText = '🔊';
+                // 成功播放后，移除全局点击监听，避免重复触发
+                document.removeEventListener('click', tryPlayMusic);
+            }).catch(e => {
+                console.log("Autoplay prevented, waiting for user interaction");
+                // 如果自动播放失败，保持静音图标，等待用户手动点击按钮
+            });
+        }
+
+        // 1. 页面加载后尝试自动播放 (部分浏览器允许)
+        tryPlayMusic();
+
+        // 2. 如果自动播放失败，用户点击页面任何地方时开始播放 (更稳妥)
+        document.addEventListener('click', tryPlayMusic, { once: true });
+
+        // 3. 按钮手动控制
+        soundBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止触发全局点击
+            if (isPlaying) {
+                bgm.pause();
+                soundBtn.innerText = '🔇';
+                isPlaying = false;
+            } else {
+                bgm.play();
+                soundBtn.innerText = '🔊';
+                isPlaying = true;
+            }
+        });
+
+        // ============================
+        // 上滑返回主页逻辑 (Reverse Gravity)
+        // ============================
+        let isNavigatingBack = false;
+
+        // 处理 bfcache (Safari/Chrome 后退缓存)，确保返回时动画重置
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                isNavigatingBack = false;
+                document.body.classList.remove('slide-down-out');
+            }
+        });
+
+        window.addEventListener('wheel', (e) => {
+            if (isNavigatingBack) return;
+
+            // e.deltaY < 0 表示向上滚动 (Pull down)
+            // 阈值 -50 避免误触
+            // window.scrollY <= 0 确保用户是在页面最顶端尝试上滑
+            if (e.deltaY < -50 && window.scrollY <= 0) {
+                isNavigatingBack = true;
+                
+                // 触发页面向下掉落动画
+                document.body.classList.add('slide-down-out');
+
+                // 延迟跳转
+                setTimeout(() => {
+                    window.location.href = "../index.html";
+                }, 800);
+            }
+        });
+
+    </script>
+
+</body>
+</html>

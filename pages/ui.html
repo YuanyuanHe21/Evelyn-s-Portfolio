@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI/UX Design - Evelyn's Portfolio</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('../assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('../assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+        /* 系统字体 (用于模拟后台) */
+        @font-face {
+            font-family: 'JetBrainsMono';
+            src: local('Courier New');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow-x: hidden;
+            color: #111;
+            cursor: default; /* 默认鼠标 */
+        }
+
+        /* 隐藏默认光标，使用自定义光标 */
+        body.system-mode {
+            cursor: none;
+        }
+
+        /* 导航 UI (保持统一) */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 100;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            mix-blend-mode: difference;
+            color: white; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover { opacity: 0.6; }
+
+        .page-title-fixed {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 100;
+            font-size: 14px;
+            color: #666;
+            font-family: 'PuHuiTi', sans-serif;
+            opacity: 0.8;
+            mix-blend-mode: difference;
+            color: white;
+        }
+
+        /* =========================================
+           2. 页面容器
+           ========================================= */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 40px 100px;
+        }
+
+        .section-header {
+            margin-bottom: 100px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 40px;
+        }
+        .section-header h1 {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 80px;
+            margin: 0;
+            line-height: 0.9;
+        }
+        .section-header p {
+            font-size: 18px;
+            color: #666;
+            margin-top: 10px;
+            max-width: 600px;
+        }
+
+        /* =========================================
+           3. 项目: CoMerit (核心区域)
+           ========================================= */
+        .project-section {
+            margin-bottom: 150px;
+            position: relative;
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .project-name {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 60px;
+            margin: 0;
+        }
+        
+        .project-desc {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .system-tag {
+            display: inline-block;
+            background: #000;
+            color: #0ffdbb; /* 荧光绿 */
+            font-family: 'JetBrainsMono', monospace;
+            font-size: 12px;
+            padding: 4px 8px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        /* 展板容器 */
+        .boards-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+            /* 鼠标进入此区域变为“扫描模式” */
+        }
+
+        .board-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .board-wrapper:hover {
+            transform: translateY(-10px);
+        }
+
+        .board-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            /* 默认状态稍微降低饱和度，模拟“未被激活” */
+            filter: grayscale(20%);
+            transition: filter 0.3s;
+        }
+
+        /* =========================================
+           4. 交互：系统光标与扫描仪
+           ========================================= */
+        
+        /* 扫描仪 (跟随鼠标的 div) */
+        #system-cursor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100px; height: 100px; /* 扫描范围 */
+            border: 2px solid #0ffdbb; /* 荧光绿边框 */
+            pointer-events: none;
+            z-index: 999;
+            display: none; /* 默认隐藏，进入区域显示 */
+            mix-blend-mode: difference; /* 核心：反色效果 */
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: invert(1); /* 核心：反转色彩 */
+        }
+
+        /* 十字准星 */
+        #system-cursor::before, #system-cursor::after {
+            content: '';
+            position: absolute;
+            background: #0ffdbb;
+        }
+        #system-cursor::before { top: 50%; left: 0; width: 100%; height: 1px; } /* 横线 */
+        #system-cursor::after { left: 50%; top: 0; width: 1px; height: 100%; } /* 竖线 */
+
+        /* 浮动数据 Tag */
+        #cursor-data {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            color: #0ffdbb;
+            font-family: 'JetBrainsMono', monospace;
+            font-size: 10px;
+            white-space: nowrap;
+            background: #000;
+            padding: 2px 4px;
+        }
+
+        /* 装饰网格线 (System Background) */
+        .system-grid {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* =========================================
+           5. Project: Portfolio Web
+           ========================================= */
+        .web-preview {
+            width: 100%;
+            height: 600px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .web-preview iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            transform: scale(1);
+            transform-origin: top left;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 导航 -->
+    <a href="../index.html" class="nav-back">← BACK TO HOME</a>
+    <div class="page-title-fixed">交互设计</div>
+
+    <!-- 背景网格 -->
+    <div class="system-grid"></div>
+
+    <!-- 自定义扫描光标 -->
+    <div id="system-cursor">
+        <div id="cursor-data">ID: NULL | SCORE: 00</div>
+    </div>
+
+    <div class="container">
+        <header class="section-header">
+            <h1>INTERFACE</h1>
+            <p>Exploring the relationship between humans and digital systems.</p>
+        </header>
+
+        <!-- Project 1: CoMerit -->
+        <section class="project-section" id="comerit-zone">
+            <div class="project-meta">
+                <div>
+                    <span class="system-tag">SYSTEM_STATUS: ONLINE</span>
+                    <h2 class="project-name">CoMerit</h2>
+                    <p style="font-family:'JetBrainsMono', monospace; font-size:12px; color:#888; margin-top:5px;">
+                        INTELLIGENT PERFORMANCE & SCORING SYSTEM
+                    </p>
+                </div>
+                <div class="project-desc">
+                    <p><strong>一个发生在未来校园中的智能绩效与评分系统。</strong></p>
+                    <p>在这个设定里，学生的学习表现、社交行为、情绪倾向都会被持续量化和评估。系统被包装成一种“智能公平”，但实际上，算法的标准会反过来塑造人的行为和身份。</p>
+                    <p>这不是一个单纯讨论“科技好或不好”的项目，而是想讨论：当算法开始参与定义“优秀”，人和系统之间到底是一种共生，还是一种不对等的关系。</p>
+                </div>
+            </div>
+
+            <!-- 展板区域 (鼠标进入这里触发扫描特效) -->
+            <div class="boards-container">
+                <!-- Board 1 -->
+                <div class="board-wrapper">
+                    <img src="../assets/images/comerit-01.png" class="board-img" alt="CoMerit Board 1" onerror="this.src='https://placehold.co/400x1200/EEE/333?text=APP+UI+01'">
+                </div>
+                <!-- Board 2 -->
+                <div class="board-wrapper">
+                    <img src="../assets/images/comerit-02.png" class="board-img" alt="CoMerit Board 2" onerror="this.src='https://placehold.co/400x1200/DDD/333?text=APP+UI+02'">
+                </div>
+                <!-- Board 3 -->
+                <div class="board-wrapper">
+                    <img src="../assets/images/comerit-03.png" class="board-img" alt="CoMerit Board 3" onerror="this.src='https://placehold.co/400x1200/CCC/333?text=APP+UI+03'">
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 2: This Website -->
+        <section class="project-section">
+            <div class="project-meta">
+                <div>
+                    <span class="system-tag">CURRENT_VIEW</span>
+                    <h2 class="project-name">Portfolio Web</h2>
+                </div>
+                <div class="project-desc">
+                    <p>你正在浏览的这个网站本身也是我的交互设计作品之一。它试图通过非线性的导航（时钟）和充满情绪化的微交互（弹幕、故障艺术），来打破传统作品集的枯燥展示。</p>
+                </div>
+            </div>
+            
+            <div class="web-preview">
+                <!-- 简单的嵌套展示，产生一种“我在看我看的东西”的错觉 -->
+                <iframe src="../index.html"></iframe>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        /* =========================================
+           系统光标与扫描交互逻辑
+           ========================================= */
+        const cursor = document.getElementById('system-cursor');
+        const cursorData = document.getElementById('cursor-data');
+        const activeZone = document.getElementById('comerit-zone');
+        const body = document.body;
+
+        // 随机生成“算法数据”
+        function updateData() {
+            const score = (Math.random() * 100).toFixed(1);
+            const id = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+            const status = Math.random() > 0.8 ? 'RISK' : 'NORMAL';
+            
+            cursorData.innerText = `ID:${id} | EVAL:${score} | ${status}`;
+            
+            // 如果分数低，显示红色警告色（通过改变边框颜色）
+            if(score < 60) {
+                cursor.style.borderColor = '#ff0055';
+                cursorData.style.color = '#ff0055';
+            } else {
+                cursor.style.borderColor = '#0ffdbb';
+                cursorData.style.color = '#0ffdbb';
+            }
+        }
+
+        // 监听鼠标移动
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // 移动自定义光标
+            cursor.style.left = `${x}px`;
+            cursor.style.top = `${y}px`;
+
+            // 检查是否在 CoMerit 区域内
+            const rect = activeZone.getBoundingClientRect();
+            const isInZone = (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
+
+            if (isInZone) {
+                cursor.style.display = 'block';
+                body.classList.add('system-mode'); // 隐藏默认鼠标
+                
+                // 频繁更新数据，模拟计算感
+                if(Math.random() > 0.5) updateData();
+                
+            } else {
+                cursor.style.display = 'none';
+                body.classList.remove('system-mode'); // 恢复默认鼠标
+            }
+        });
+
+    </script>
+</body>
+</html>

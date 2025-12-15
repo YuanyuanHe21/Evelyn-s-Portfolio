@@ -50,6 +50,12 @@
             height: 100vh;
             width: 100vw;
             position: relative; /* 作为绝对定位元素的基准 */
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1); /* 添加页面整体移动动画 */
+        }
+
+        /* 页面上滑消失的类 */
+        body.slide-up-out {
+            transform: translateY(-100vh);
         }
 
         /* 背景图 */
@@ -405,9 +411,9 @@
     <h1 class="portfolio-title">EVELYN ’S PORTFOLIO</h1>
     
     <div class="social-icons">
-        <a href="about.html"><img src="assets/images/social-ins.png" class="social-btn" alt="IG" onerror="this.style.background='#000';this.style.borderRadius='50%'"></a>
-        <a href="about.html"><img src="assets/images/social-link.png" class="social-btn" alt="In" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
-        <a href="about.html"><img src="assets/images/social-web.png" class="social-btn" alt="Web" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-ins.svg" class="social-btn" alt="IG" onerror="this.style.background='#000';this.style.borderRadius='50%'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-link.svg" class="social-btn" alt="In" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-web.svg" class="social-btn" alt="Web" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
     </div>
 
     <p class="intro-text-cn">
@@ -449,14 +455,15 @@
     <img src="assets/images/minute-hand.png" id="minute-hand" class="hand" alt="minute">
     <img src="assets/images/second-hand.png" id="second-hand" class="hand" alt="second">
 
-    <!-- 牛马头像 -->
-    <button id="center-avatar" data-target="about.html">
+    <!-- 牛马头像 (About链接修正) -->
+    <button id="center-avatar" data-target="pages/about.html">
         <img src="assets/images/center-avatar.png" alt="About Me" onerror="this.src='https://placehold.co/220x220/png?text=COW';">
     </button>
 
     <!-- 刻度项目 -->
     
-    <div class="clock-item item-12" data-angle="0" data-target="assistant.html">
+    <!-- 12点: 加班 (修改了路径) -->
+    <div class="clock-item item-12" data-angle="0" data-target="pages/assistant.html">
         <div class="click-layer">
             <div class="overtime-wrapper">
                 <span class="label bg-pink">加班</span>
@@ -468,11 +475,11 @@
         </div>
     </div>
 
-    <div class="clock-item item-2" data-angle="45" data-target="comics.html">
+    <div class="clock-item item-2" data-angle="45" data-target="pages/comics.html">
         <div class="click-layer"><span class="label bg-gray">改稿</span></div>
     </div>
 
-    <div class="clock-item item-3" data-angle="70" data-target="games.html">
+    <div class="clock-item item-3" data-angle="70" data-target="pages/games.html">
         <div class="click-layer">
             <div class="software-block">
                 <img src="assets/images/icons/unity.svg" class="icon" alt="Unity" onerror="this.style.background='#000'">
@@ -481,14 +488,14 @@
         </div>
     </div>
 
-    <div class="clock-item item-4" data-angle="105" data-target="courses.html">
+    <div class="clock-item item-4" data-angle="105" data-target="pages/courses.html">
         <div class="click-layer">
             <span class="label bg-mint">上课</span>
             <span class="sub">ATTEND CLASS</span>
         </div>
     </div>
 
-    <div class="clock-item item-5" data-angle="135" data-target="installations.html">
+    <div class="clock-item item-5" data-angle="135" data-target="pages/installations.html">
         <div class="click-layer">
             <span class="vertical-text arduino-label bg-mint">Arduino IDE</span>
             <div class="software-block">
@@ -497,7 +504,7 @@
         </div>
     </div>
 
-    <div class="clock-item item-6" data-angle="180" data-target="burnout.html">
+    <div class="clock-item item-6" data-angle="180" data-target="pages/burnout.html">
         <div class="click-layer">
             <span class="label bg-gray">燃尽了…</span>
             <img src="assets/images/emoji/burnout.png" class="small-emoji" alt="💀" onerror="this.style.display='none'">
@@ -510,7 +517,7 @@
         </div>
     </div>
 
-    <div class="clock-item item-8" data-angle="235" data-target="ui.html">
+    <div class="clock-item item-8" data-angle="235" data-target="pages/ui.html">
         <div class="click-layer">
             <div class="software-block">
                 <img src="assets/images/icons/figma.svg" class="icon" alt="Figma" onerror="this.style.background='orange'">
@@ -519,7 +526,7 @@
         </div>
     </div>
 
-    <div class="clock-item item-9" data-angle="265" id="pitch-button" data-target="proposal.html">
+    <div class="clock-item item-9" data-angle="265" id="pitch-button" data-target="pages/proposal.html">
         <div class="click-layer">
             <span class="sub bg-mint">开机</span>
             <span class="label bg-gray">提案</span>
@@ -535,7 +542,7 @@
         </div>
     </div>
 
-    <div class="clock-item item-11" data-angle="337" data-target="photography.html">
+    <div class="clock-item item-11" data-angle="337" data-target="pages/photography.html">
         <div class="click-layer">
             <span class="vertical-text main-text bg-gray">暂停营业</span>
             <span class="vertical-text sub-text">*暂时无法工作</span>
@@ -547,6 +554,7 @@
 <!-- 音效 -->
 <audio id="tick-sound" src="assets/audio/tick.mp3" preload="auto"></audio>
 <audio id="sfx-click" src="assets/audio/click.mp3" preload="auto"></audio>
+<audio id="sfx-moo" src="assets/audio/moo.mp3" preload="auto"></audio>
 
 <!-- JS 逻辑 -->
 <script>
@@ -629,15 +637,68 @@
         secondHand.style.transition = "none";
     }
 
+    /* --------------------------------------
+       新的逻辑：滚轮下滚检测
+       -------------------------------------- */
+    let isNavigatingToHidden = false; // 防止重复触发
+
+    // Fix for bfcache (Safari/Chrome back button cache)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            // Reset state if loaded from cache
+            isNavigatingToHidden = false;
+            document.body.classList.remove('slide-up-out');
+            const sfxMoo = document.getElementById("sfx-moo");
+            if (sfxMoo) {
+                sfxMoo.pause();
+                sfxMoo.currentTime = 0;
+            }
+        }
+    });
+
+    window.addEventListener('wheel', (e) => {
+        if (isNavigatingToHidden) return;
+
+        if (e.deltaY > 50) {
+            isNavigatingToHidden = true;
+            
+            const sfxMoo = document.getElementById("sfx-moo");
+            let delay = 2500; // Default wait if meta not loaded
+
+            if (sfxMoo) {
+                sfxMoo.currentTime = 0;
+                sfxMoo.play().catch(()=>{});
+                if (sfxMoo.duration && !isNaN(sfxMoo.duration)) {
+                    delay = sfxMoo.duration * 1000;
+                }
+            }
+
+            document.body.classList.add('slide-up-out');
+
+            setTimeout(() => {
+                window.location.href = "pages/hidden.html";
+            }, delay); 
+        }
+    });
+
     document.addEventListener("DOMContentLoaded", () => {
         const items = document.querySelectorAll(".clock-item");
         const clickSfx = document.getElementById("sfx-click");
         const avatar = document.getElementById("center-avatar");
+        const sfxMoo = document.getElementById("sfx-moo");
 
         if(avatar) {
             avatar.addEventListener("mouseenter", () => avatar.classList.add("avatar-hover"));
             avatar.addEventListener("mouseleave", () => avatar.classList.remove("avatar-hover"));
-            avatar.addEventListener("click", () => window.location.href = "about.html");
+            
+            // 点击头像依然有效，跳转 About
+            avatar.addEventListener("click", (e) => {
+                e.preventDefault();
+                // 🔴 修改：点击中间头像先跳转 loading 页，带上参数
+                setTimeout(() => {
+                    window.location.href = "loading.html?dest=" + encodeURIComponent("pages/about.html");
+                }, 100); // 稍微给一点延迟让点击音效出来，然后让loading页处理
+            });
         }
 
         items.forEach(item => {
@@ -670,7 +731,10 @@
                 item.classList.remove("pressed");
                 const target = item.dataset.target;
                 if (target && target !== "none" && item.id !== "pitch-button") {
-                    setTimeout(() => window.location.href = target, 150);
+                    // 🔴 修改：跳转 loading.html，并将真实地址作为参数 dest 传递
+                    setTimeout(() => {
+                        window.location.href = `loading.html?dest=${encodeURIComponent(target)}`;
+                    }, 150);
                 }
             });
             item.addEventListener("mouseleave", () => item.classList.remove("pressed"));
