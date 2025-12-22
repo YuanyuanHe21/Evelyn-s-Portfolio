@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overtime Log - Evelyn's Portfolio</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('../assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('../assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* 深夜的黑色背景 */
+            /* 🔴 修改：字体统一为 Instrument Sans */
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow-x: hidden;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 100px;
+        }
+
+        /* 导航 */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 100;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: white; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover { opacity: 1; }
+
+        /* 右上角时间显示 */
+        .clock-widget {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            font-family: 'BebasNeue', sans-serif; /* 🔴 修改：统一字体 */
+            color: #ff0055;
+            font-size: 28px;
+            z-index: 100;
+            text-shadow: 0 0 10px rgba(255,0,85,0.5);
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           2. 收据容器 (The Receipt)
+           ========================================= */
+        .receipt-container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            margin-top: -50px; 
+            padding: 80px 40px 60px;
+            box-shadow: 0 0 80px rgba(0,0,0,0.8);
+            position: relative;
+            transform-origin: top center;
+            animation: print-paper 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes print-paper {
+            from { transform: translateY(-100vh); }
+            to { transform: translateY(100px); }
+        }
+
+        /* 锯齿边缘 */
+        .receipt-container::after {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: #fff;
+            clip-path: polygon(
+                0% 0%, 100% 0%, 100% 100%, 
+                97% 0%, 94% 100%, 91% 0%, 88% 100%, 85% 0%, 82% 100%, 79% 0%, 76% 100%, 73% 0%, 70% 100%, 67% 0%, 64% 100%, 61% 0%, 58% 100%, 55% 0%, 52% 100%, 49% 0%, 46% 100%, 43% 0%, 40% 100%, 37% 0%, 34% 100%, 31% 0%, 28% 100%, 25% 0%, 22% 100%, 19% 0%, 16% 100%, 13% 0%, 10% 100%, 7% 0%, 4% 100%, 1% 0%, 0% 100%
+            );
+        }
+
+        /* 内容样式 */
+        .receipt-header {
+            text-align: center;
+            border-bottom: 3px solid #000; /* 🔴 修改：更粗的实线，更符合平面风格 */
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .logo-text {
+            font-family: 'BebasNeue', sans-serif; /* 🔴 修改：统一字体 */
+            font-size: 48px;
+            margin: 0;
+            line-height: 1;
+        }
+        .meta-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+
+        /* 任务条目 */
+        .task-item {
+            margin-bottom: 60px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        .task-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .task-title { 
+            font-family: 'BebasNeue', sans-serif; /* 🔴 修改：统一字体 */
+            font-size: 24px; 
+            letter-spacing: 1px;
+        }
+        .task-time { font-size: 14px; color: #888; font-weight: bold; }
+
+        /* 图片展示网格 */
+        .img-grid {
+            display: grid;
+            gap: 15px;
+            width: 100%;
+        }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-1 { grid-template-columns: 1fr; }
+
+        .task-img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #eee;
+            filter: grayscale(100%) contrast(1.1);
+            transition: all 0.3s;
+            cursor: zoom-in;
+            display: block;
+        }
+        .task-img:hover {
+            filter: grayscale(0%) contrast(1);
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 🔴 修复：印章特效 */
+        .stamp {
+            position: absolute;
+            top: 10%;
+            right: -10px;
+            width: 100px;
+            height: 100px;
+            border: 5px solid #d00;
+            color: #d00;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 28px;
+            transform: rotate(-20deg) scale(2);
+            opacity: 0; /* 初始隐藏 */
+            pointer-events: none;
+            mix-blend-mode: multiply; /* 保持正片叠底 */
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.1); /* 轻微背景增加实体感 */
+        }
+        
+        .task-item.stamped .stamp {
+            animation: stamp-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation-delay: 0.2s; 
+        }
+
+        @keyframes stamp-in {
+            0% { transform: rotate(-20deg) scale(2); opacity: 0; }
+            100% { transform: rotate(-20deg) scale(1); opacity: 0.8; }
+        }
+
+        /* 底部条形码 */
+        .barcode {
+            height: 50px;
+            background: repeating-linear-gradient(
+                90deg,
+                #000,
+                #000 2px,
+                #fff 2px,
+                #fff 5px
+            );
+            margin: 60px 0 20px;
+            opacity: 0.8;
+        }
+        .footer-text {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* =========================================
+           3. Lightbox (大图查看器)
+           ========================================= */
+        #lightbox {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none; /* 默认隐藏 */
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+            padding: 40px;
+            box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+        
+        #lightbox.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        #lightbox img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            animation: scaleIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); } to { transform: scale(1); } }
+
+    </style>
+</head>
+<body>
+
+    <!-- 返回导航 -->
+    <a href="../index.html" class="nav-back">← CLOCK OUT</a>
+
+    <!-- 时间显示 -->
+    <div class="clock-widget" id="time-display">00:00 AM</div>
+
+    <!-- 收据主体 -->
+    <div class="receipt-container">
+        
+        <!-- 收据头 -->
+        <div class="receipt-header">
+            <h1 class="logo-text">DESIGN LOG</h1>
+            <div class="meta-info">
+                DATE: 2024-2025<br>
+                ASSISTANT ID: EVELYN-007<br>
+                SHIFT: OVERNIGHT
+            </div>
+        </div>
+
+        <!-- 任务 1: EHS 安全海报 -->
+        <div class="task-item" data-time="00:45">
+            <div class="task-header">
+                <span class="task-title">EHS SAFETY POSTERS</span>
+                <span class="task-time">00:45 AM</span>
+            </div>
+            <div class="img-grid grid-3">
+                <img src="../assets/images/ehs-elevator.png" class="task-img" alt="Elevator" onerror="this.src='https://placehold.co/300x450/EEE/333?text=Elevator'">
+                <img src="../assets/images/ehs-traffic.png" class="task-img" alt="Traffic" onerror="this.src='https://placehold.co/300x450/EEE/333?text=Traffic'">
+                <img src="../assets/images/ehs-fire.png" class="task-img" alt="Fire" onerror="this.src='https://placehold.co/300x450/EEE/333?text=Fire'">
+            </div>
+            <div class="stamp">POSTED</div>
+        </div>
+
+        <!-- 任务 2: 实验安全视频比赛文创 -->
+        <div class="task-item" data-time="01:30">
+            <div class="task-header">
+                <span class="task-title">LAB SAFETY MERCH</span>
+                <span class="task-time">01:30 AM</span>
+            </div>
+            <!-- 一张大图概念图 + 3张小图 -->
+            <div class="img-grid grid-1" style="margin-bottom: 15px;">
+                <img src="../assets/images/lab-concept.png" class="task-img" alt="Concept" onerror="this.src='https://placehold.co/600x300/EEE/333?text=Concept+Art'">
+            </div>
+            <div class="img-grid grid-3">
+                <img src="../assets/images/lab-bag.png" class="task-img" alt="Tote Bag" onerror="this.src='https://placehold.co/200x200/EEE/333?text=Bag'">
+                <img src="../assets/images/lab-cup.png" class="task-img" alt="Cup" onerror="this.src='https://placehold.co/200x200/EEE/333?text=Cup'">
+                <img src="../assets/images/lab-card.png" class="task-img" alt="Card" onerror="this.src='https://placehold.co/200x200/EEE/333?text=Card'">
+            </div>
+            <div class="stamp">DONE</div>
+        </div>
+
+        <!-- 任务 3: 宿舍楼门贴 -->
+        <div class="task-item" data-time="02:15">
+            <div class="task-header">
+                <span class="task-title">DORM DOOR STICKER</span>
+                <span class="task-time">02:15 AM</span>
+            </div>
+            <div class="img-grid grid-1">
+                <img src="../assets/images/dorm-sticker.png" class="task-img" alt="Door Sticker" onerror="this.src='https://placehold.co/600x400/EEE/333?text=Door+Sticker+Illustration'">
+            </div>
+            <div class="stamp">PRINTED</div>
+        </div>
+
+        <!-- 任务 4: 校团委文创 -->
+        <div class="task-item" data-time="03:50">
+            <div class="task-header">
+                <span class="task-title">YOUTH LEAGUE GIFTS</span>
+                <span class="task-time">03:50 AM</span>
+            </div>
+            <div class="img-grid grid-3">
+                <img src="../assets/images/league-bag.png" class="task-img" alt="Bag" onerror="this.src='https://placehold.co/200x200/EEE/333?text=Bag'">
+                <img src="../assets/images/league-pen.png" class="task-img" alt="Pen" onerror="this.src='https://placehold.co/200x200/EEE/333?text=Pen'">
+                <img src="../assets/images/league-card.png" class="task-img" alt="Card" onerror="this.src='https://placehold.co/200x200/EEE/333?text=Card'">
+            </div>
+            <div class="stamp">APPROVED</div>
+        </div>
+
+        <!-- 底部 -->
+        <div class="barcode"></div>
+        <div class="footer-text">
+            THANK YOU FOR WORKING HARD<br>
+            PLEASE GO TO SLEEP
+        </div>
+
+    </div>
+
+    <!-- Lightbox (大图查看器) -->
+    <div id="lightbox">
+        <img src="" alt="Full View">
+    </div>
+
+    <script>
+        /* =========================================
+           1. 滚动检测与盖章逻辑
+           ========================================= */
+        const tasks = document.querySelectorAll('.task-item');
+        const timeDisplay = document.getElementById('time-display');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    setTimeout(() => {
+                        entry.target.classList.add('stamped');
+                    }, 300);
+
+                    const time = entry.target.dataset.time;
+                    if(time) timeDisplay.innerText = time + ' AM';
+                }
+            });
+        }, { threshold: 0.3 });
+
+        tasks.forEach(task => observer.observe(task));
+
+        // 初始时间
+        timeDisplay.innerText = "00:00 AM";
+
+        /* =========================================
+           2. Lightbox (点击查看大图)
+           ========================================= */
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = lightbox.querySelector('img');
+        const allImages = document.querySelectorAll('.task-img');
+
+        // 打开
+        allImages.forEach(img => {
+            img.addEventListener('click', (e) => {
+                e.stopPropagation();
+                lightboxImg.src = img.src;
+                lightbox.classList.add('active');
+            });
+        });
+
+        // 关闭
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+
+    </script>
+</body>
+</html>

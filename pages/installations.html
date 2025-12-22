@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installations - Evelyn's Portfolio</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('../assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('../assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'JetBrainsMono'; 
+            src: local('Courier New'), monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4; /* 浅色背景，与主页统一 */
+            color: #333;
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* 导航 (统一风格) */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 1000;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            mix-blend-mode: difference;
+            color: white;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover { opacity: 0.6; }
+
+        .page-title-fixed {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 100;
+            font-size: 14px;
+            color: #666;
+            font-family: 'PuHuiTi', sans-serif;
+            opacity: 0.8;
+            mix-blend-mode: difference;
+            color: white;
+        }
+
+        /* =========================================
+           2. 通用布局
+           ========================================= */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 40px 200px;
+        }
+
+        .section-header {
+            margin-bottom: 100px;
+            text-align: center;
+        }
+        .section-header h1 {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 80px;
+            margin: 0;
+            line-height: 0.9;
+            color: #000;
+        }
+        .section-header p {
+            font-size: 18px;
+            color: #666;
+            margin-top: 10px;
+            font-family: 'InstrumentSans-Regular', sans-serif;
+        }
+
+        .project-section {
+            margin-bottom: 180px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .project-header {
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .project-title {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 48px;
+            color: #000;
+            margin: 0 0 10px 0;
+            letter-spacing: 1px;
+        }
+
+        .project-tags {
+            font-family: 'InstrumentSans-Regular', sans-serif;
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .project-desc {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .interaction-tip {
+            display: inline-block;
+            background: #000;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        /* =========================================
+           Project 1: 短暂离席 (复古电视 - 唯美版)
+           ========================================= */
+        /* 电视放在一个干净的桌面上 */
+        .tv-frame {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            aspect-ratio: 4/3;
+            background: #e0e0e0; /* 浅灰外壳 */
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1); /* 柔和阴影 */
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .tv-frame:active {
+            transform: scale(0.99);
+        }
+
+        .tv-screen-container {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 20px; /* 屏幕圆角 */
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ccc;
+        }
+
+        .tv-screen {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            z-index: 1;
+            /* 唯美图片，默认可见，无需长按才显示，改为长按播放干扰/切换 */
+            /* 或者维持原逻辑：坐下（长按）通电。为了“唯美”，默认可以是黑屏或雪花，长按显示美丽画面 */
+        }
+
+        /* 雪花屏层 */
+        .tv-static {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABZJREFUeNpi2r9//38gYGAEESAAEGAAasgJOgzOKCoAAAAASUVORK5CYII=');
+            background-size: 4px 4px;
+            opacity: 1; /* 默认显示雪花（未通电/未坐下） */
+            transition: opacity 0.4s ease;
+            z-index: 2;
+            animation: static-noise 0.2s infinite steps(4);
+            mix-blend-mode: overlay;
+            background-color: #222;
+        }
+
+        /* 扫描线 - 减弱以保持画面清晰 */
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        @keyframes static-noise {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+
+        /* 长按交互：模拟坐下，雪花消失，显示画面 */
+        .tv-frame:active .tv-static {
+            opacity: 0;
+        }
+
+
+        /* =========================================
+           Project 2: 卡西尼环缝 (探测扫描 - 极简风)
+           ========================================= */
+        .scanner-frame {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 550px;
+            background: #000;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            cursor: none; /* 隐藏默认鼠标 */
+        }
+
+        .space-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* 默认全彩显示，但稍微暗一点，光圈内更亮 */
+            filter: brightness(0.6) grayscale(20%);
+            transition: filter 0.5s;
+        }
+
+        /* 探测器光圈 - 改为白色极简风 */
+        .probe-cursor {
+            position: absolute;
+            top: 0; left: 0;
+            width: 180px;
+            height: 180px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10;
+            /* 玻璃拟态 */
+            backdrop-filter: brightness(1.8) grayscale(0%) blur(0px);
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .probe-center {
+            width: 4px; height: 4px; background: #fff; border-radius: 50%;
+        }
+
+        .probe-data {
+            position: absolute;
+            bottom: -40px;
+            font-family: 'JetBrainsMono', monospace;
+            color: #333;
+            font-size: 12px;
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* =========================================
+           Project 3: DT 海报 (放大镜/聚光灯 - 浅色版)
+           ========================================= */
+        /* 模拟挂在墙上的画框 */
+        .poster-frame {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* 控制海报宽度 */
+            aspect-ratio: 2/3; /* 竖版海报比例 */
+            background-color: #fff;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            cursor: crosshair;
+            margin: 0 auto;
+        }
+        
+        .blueprint-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* 默认模糊一点，像是在远处 */
+            filter: blur(2px) grayscale(30%);
+            transition: filter 0.3s;
+        }
+
+        /* 放大镜/清晰视窗 */
+        .clear-view {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            /* 原始清晰图作为背景 */
+            background-image: url('../assets/images/install-poster.png'); /* 需JS同步 */
+            background-size: cover; /* 需与img一致 */
+            /* 遮罩实现局部清晰 */
+            mask-image: radial-gradient(circle 120px at var(--x) var(--y), black 100%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle 120px at var(--x) var(--y), black 100%, transparent 100%);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* 边框装饰 */
+        .frame-border {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: 10px solid #fff;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 导航 -->
+    <a href="../index.html" class="nav-back">← BACK TO HOME</a>
+    <div class="page-title-fixed">物理装置</div>
+
+    <div class="container">
+        
+        <header class="section-header">
+            <h1>PHYSICAL COMPUTING</h1>
+            <p>Interactions between Digital Bits and Physical Atoms.</p>
+        </header>
+
+        <!-- Project 1: 短暂离席 -->
+        <section class="project-section">
+            <div class="project-header">
+                <h2 class="project-title">Brief Absence</h2>
+                <div class="project-tags">Arduino / Raspberry Pi / Installation</div>
+                <div class="project-desc">
+                    物理空间互动装置。模拟千禧年家庭空间，利用摇椅下的压力传感器控制老电视的通电状态。
+                </div>
+                <span class="interaction-tip">按住电视屏幕模拟“坐下”</span>
+            </div>
+
+            <!-- 电视机容器 -->
+            <div class="tv-frame" id="tv-box">
+                <div class="tv-screen-container">
+                    <!-- 你的唯美作品图 -->
+                    <div class="tv-screen" style="background-image: url('../assets/images/install-tv.png');"></div>
+                    <!-- 雪花遮罩 -->
+                    <div class="tv-static"></div>
+                    <!-- 扫描线 -->
+                    <div class="scanlines"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Project 2: 卡西尼环缝 -->
+        <section class="project-section">
+            <div class="project-header">
+                <h2 class="project-title">Cassini Division</h2>
+                <div class="project-tags">Cross-media / Space / Interaction</div>
+                <div class="project-desc">
+                    跨媒介空间装置。玩家置身于土星环走廊中，通过手持模型对陨石成分进行分析。
+                </div>
+                <span class="interaction-tip">移动鼠标进行成分检测</span>
+            </div>
+
+            <div class="scanner-frame" id="scanner-box">
+                <!-- 背景图 -->
+                <img src="../assets/images/install-cassini.png" class="space-bg" alt="Cassini Corridor" onerror="this.src='https://placehold.co/1000x600/222/555?text=Space+Aesthetics'">
+                <!-- 探测光圈 -->
+                <div class="probe-cursor" id="probe">
+                    <div class="probe-center"></div>
+                    <div class="probe-data">Scanning...</div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Project 3: DT 海报 -->
+        <section class="project-section">
+            <div class="project-header">
+                <h2 class="project-title">Design Thinking</h2>
+                <div class="project-tags">Poster / Methodology</div>
+                <div class="project-desc">
+                    设计思维课程成果展示。
+                </div>
+                <span class="interaction-tip">移动以查看细节</span>
+            </div>
+
+            <div class="poster-frame" id="poster-box">
+                <!-- 底图 (模糊) -->
+                <img src="../assets/images/install-poster.png" class="blueprint-img" alt="DT Poster" onerror="this.src='https://placehold.co/800x1200/eee/ccc?text=Aesthetic+Poster'">
+                <!-- 清晰层 (通过mask显示) -->
+                <div class="clear-view" style="background-image: url('../assets/images/install-poster.png');"></div>
+                <!-- 边框 -->
+                <div class="frame-border"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        /* =========================================
+           Project 1: TV 交互逻辑
+           ========================================= */
+        // CSS :active 已经处理了按下的视觉反馈
+        
+        /* =========================================
+           Project 2: 卡西尼扫描逻辑
+           ========================================= */
+        const scannerBox = document.getElementById('scanner-box');
+        const probe = document.getElementById('probe');
+        const probeData = probe.querySelector('.probe-data');
+
+        scannerBox.addEventListener('mousemove', (e) => {
+            const rect = scannerBox.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // 移动光圈
+            probe.style.left = `${x}px`;
+            probe.style.top = `${y}px`;
+
+            // 随机生成化学成分数据
+            if (Math.random() > 0.9) {
+                const elements = ['Fe', 'H2O', 'Si', 'Mg', 'Ni'];
+                const el = elements[Math.floor(Math.random() * elements.length)];
+                const pct = Math.floor(Math.random() * 90 + 10) + '%';
+                probeData.innerText = `Analyzing: ${el} ${pct}`;
+            }
+        });
+        
+        // 离开时隐藏光圈
+        scannerBox.addEventListener('mouseleave', () => {
+             // 可以选择隐藏或重置位置
+        });
+
+        /* =========================================
+           Project 3: 海报放大镜逻辑
+           ========================================= */
+        const posterBox = document.getElementById('poster-box');
+        const clearView = posterBox.querySelector('.clear-view');
+        // 同步背景图 (如果JS动态加载图片)
+        // clearView.style.backgroundImage = `url(${posterBox.querySelector('img').src})`;
+
+        posterBox.addEventListener('mousemove', (e) => {
+            const rect = posterBox.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 更新 Mask 位置
+            posterBox.style.setProperty('--x', `${x}px`);
+            posterBox.style.setProperty('--y', `${y}px`);
+        });
+
+    </script>
+</body>
+</html>

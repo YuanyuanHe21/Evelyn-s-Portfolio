@@ -276,55 +276,72 @@
         const sfxGlitch = document.getElementById('sfx-glitch');
         const sfxExplode = document.getElementById('sfx-explode');
 
-        // 模拟加载循环
-        const interval = setInterval(() => {
-            progress += increment;
+        // 初始化/重置函数 (用于初次加载和回退恢复)
+        function initLoading() {
+            progress = 0;
+            percentEl.innerText = '0%';
             
-            // 随机卡顿一下，模拟真实加载
-            if(Math.random() > 0.8) progress -= 0.5; 
+            // 重置样式
+            catCalm.style.opacity = 1;
+            catCalm.style.display = 'block';
+            catCrazy.style.display = 'none';
+            catCrazy.style.opacity = 0;
+            kanjiEl.innerText = "静";
+            statusTextEl.innerText = "I AM FINE.";
+            body.style.transform = 'none';
+            body.classList.remove('body-shake', 'page-explode');
+            body.style.backgroundColor = '#ffffff';
+            spinner.style.display = 'block';
+            enterBtn.style.display = 'none';
+            body.style.cursor = 'progress';
 
-            // 更新文字
-            let displayProgress = Math.floor(progress);
-            if (displayProgress > 100) displayProgress = 100;
-            percentEl.innerText = displayProgress + '%';
+            // 开始加载循环
+            startLoadingLoop();
+        }
 
-            // ⚡️ 阶段 1: 80% 时开始不稳定
-            if (displayProgress > 80) {
-                // 偶尔闪现疯猫
-                if (Math.random() > 0.7) {
-                    catCalm.style.opacity = 0;
-                    catCrazy.style.display = 'block';
-                    catCrazy.style.opacity = 1;
-                    kanjiEl.innerText = "疯"; // 闪烁汉字
-                    
-                    // 播放故障音效
-                    if (sfxGlitch) {
-                        sfxGlitch.currentTime = 0;
-                        sfxGlitch.play().catch(() => {}); // 捕获错误防止报错
+        // 模拟加载循环
+        let interval;
+        function startLoadingLoop() {
+            clearInterval(interval); // 防止重复
+            interval = setInterval(() => {
+                progress += increment;
+                
+                if(Math.random() > 0.8) progress -= 0.5; 
+
+                let displayProgress = Math.floor(progress);
+                if (displayProgress > 100) displayProgress = 100;
+                percentEl.innerText = displayProgress + '%';
+
+                if (displayProgress > 80) {
+                    if (Math.random() > 0.7) {
+                        catCalm.style.opacity = 0;
+                        catCrazy.style.display = 'block';
+                        catCrazy.style.opacity = 1;
+                        kanjiEl.innerText = "疯"; 
+                        
+                        if (sfxGlitch) {
+                            sfxGlitch.currentTime = 0;
+                            sfxGlitch.play().catch(() => {}); 
+                        }
+                    } else {
+                        catCalm.style.opacity = 1;
+                        catCrazy.style.display = 'none';
+                        catCrazy.style.opacity = 0;
+                        kanjiEl.innerText = "静";
                     }
-                } else {
-                    catCalm.style.opacity = 1;
-                    catCrazy.style.display = 'none';
-                    catCrazy.style.opacity = 0;
-                    kanjiEl.innerText = "静";
+                    body.style.transform = `translate(${Math.random()*2 - 1}px, ${Math.random()*2 - 1}px)`;
                 }
-                // 屏幕轻微抖动
-                body.style.transform = `translate(${Math.random()*2 - 1}px, ${Math.random()*2 - 1}px)`;
-            }
 
-            // ✅ 阶段 2: 加载完成
-            if (progress >= 100) {
-                clearInterval(interval);
-                finishLoading();
-            }
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    finishLoading();
+                }
 
-        }, 1000 / frameRate);
+            }, 1000 / frameRate);
+        }
 
         function finishLoading() {
-            // 1. 强制设为 100%
-            percentEl.innerText = ''; // 隐藏进度数字
-            
-            // 2. 状态彻底切换
+            percentEl.innerText = ''; 
             catCalm.style.display = 'none';
             catCrazy.style.display = 'block';
             catCrazy.style.opacity = 1;
@@ -332,34 +349,38 @@
             kanjiEl.innerText = "疯";
             statusTextEl.innerText = "I AM CRAZY.";
             
-            // 3. 视觉特效
-            body.style.transform = 'none'; // 停止位移
-            body.classList.add('body-shake'); //以此CSS动画代替
-            body.style.backgroundColor = '#f4f4f4'; // 背景稍微变灰一点增加氛围
+            body.style.transform = 'none'; 
+            body.classList.add('body-shake'); 
+            body.style.backgroundColor = '#f4f4f4'; 
             
-            // 4. 隐藏加载圈，显示进入按钮
             spinner.style.display = 'none';
             enterBtn.style.display = 'flex';
             body.style.cursor = 'pointer';
         }
 
-        // 点击进入目标页面 (修改为读取参数)
+        // 🟢 核心修复：监听页面显示 (Back Button Cache)
+        window.addEventListener('pageshow', (event) => {
+            // 如果页面是从缓存加载的 (用户按了后退键)
+            if (event.persisted) {
+                // 重新初始化加载流程
+                initLoading();
+            }
+        });
+
+        // 页面首次加载
+        initLoading();
+
+        // 点击进入主页
         enterBtn.addEventListener('click', () => {
-            // 播放爆炸音效
             if (sfxExplode) {
                 sfxExplode.play().catch(() => {});
             }
 
-            // 播放爆炸/退出动画
             document.body.classList.add('page-explode');
             
-            // 获取 URL 中的 dest 参数
-            const params = new URLSearchParams(window.location.search);
-            const destination = params.get('dest') || 'index.html'; // 如果没有参数，默认回主页
-
-            // 延迟跳转
             setTimeout(() => {
-                window.location.href = destination;
+                // 🔴 修改：永远只去 index.html
+                window.location.href = 'index.html';
             }, 700);
         });
 

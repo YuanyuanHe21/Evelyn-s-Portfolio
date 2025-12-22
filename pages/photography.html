@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Closed for Hiking - Evelyn's Vlogs</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('../assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('../assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            /* 背景维持米灰色 */
+            background-color: #f2f2f0; 
+            background-image: 
+                repeating-linear-gradient(45deg, #e8e8e6 0, #e8e8e6 1px, transparent 0, transparent 50%),
+                radial-gradient(circle at 50% 50%, #ffffff 0%, #dcdcdc 100%);
+            background-size: 30px 30px, 100% 100%;
+            
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            color: #333;
+        }
+
+        /* 导航 */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 2000;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover { opacity: 1; }
+
+        /* =========================================
+           2. 闭店挂牌 (初始遮挡状态)
+           ========================================= */
+        #sign-container {
+            position: fixed;
+            top: 0; 
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(244, 244, 244, 0.9); /* 调整为更接近背景的颜色 */
+            backdrop-filter: blur(8px);
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        /* 激活类：向上收起 */
+        #sign-container.hidden {
+            transform: translateY(-120%);
+        }
+
+        .sign-board {
+            width: 380px;
+            padding: 60px 30px 100px 30px; /* 底部留更多空间 */
+            /* 🔴 配色修改：改为黑白工业风 */
+            background: #ffffff;
+            border: 4px solid #000;
+            border-radius: 4px; /* 更硬朗的圆角 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 15px 15px 0px rgba(0,0,0,0.1); /* 硬阴影 */
+            position: relative;
+            text-align: center;
+            transform-origin: top center;
+            animation: swing 3s infinite ease-in-out;
+            cursor: pointer; /* 改为手型，提示可点击 */
+        }
+
+        /* 顶部挂绳 */
+        .sign-rope-top-left, .sign-rope-top-right {
+            position: absolute;
+            top: -100vh; 
+            width: 4px;
+            height: 100vh;
+            background: #000; /* 黑色绳子 */
+        }
+        .sign-rope-top-left { left: 60px; }
+        .sign-rope-top-right { right: 60px; }
+
+        .sign-text {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 100px; /* 更大的字体 */
+            color: #000;
+            line-height: 0.8;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+        }
+        .sign-sub {
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            font-size: 18px;
+            /* 🔴 配色修改：使用粉色点缀 */
+            color: #000;
+            background-color: #f9a7e3; 
+            padding: 2px 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: rotate(-2deg); /* 稍微倾斜增加趣味 */
+        }
+
+        /* =========================================
+           3. 拉绳开关 (挂在牌子上)
+           ========================================= */
+        .pull-cord-wrapper {
+            position: absolute;
+            bottom: -50px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 100px;
+            cursor: pointer; /* 改为点击手型 */
+            z-index: 10;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* 悬停时轻微拉动效果 */
+        .pull-cord-wrapper:hover {
+            transform: translateX(-50%) translateY(10px);
+        }
+        
+        .pull-cord-wrapper:active { 
+            transform: translateX(-50%) translateY(20px);
+        }
+
+        .rope-line {
+            position: absolute;
+            top: -30px; 
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            /* 🔴 配色修改：黑色绳子 */
+            background: #000;
+            transform: translateX(-50%);
+        }
+
+        .rope-handle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            /* 🔴 配色修改：薄荷绿手柄 */
+            background: #0ffdbb;
+            border: 3px solid #000;
+            border-radius: 50%;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.2);
+        }
+
+        .pull-hint {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #000;
+            white-space: nowrap;
+            opacity: 0.5;
+            font-weight: bold;
+            pointer-events: none;
+            font-family: 'BebasNeue', sans-serif;
+            letter-spacing: 1px;
+            animation: floatHint 2s infinite ease-in-out;
+        }
+        @keyframes floatHint { 0%,100% {transform:translate(-50%,0);} 50% {transform:translate(-50%,5px);} }
+
+        @keyframes swing {
+            0% { transform: rotate(0.5deg); }
+            50% { transform: rotate(-0.5deg); }
+            100% { transform: rotate(0.5deg); }
+        }
+
+        /* =========================================
+           4. 桌面与动态视频卡片
+           ========================================= */
+        #desk-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+        }
+
+        .polaroid {
+            position: absolute;
+            background: #fff;
+            padding: 10px 10px 45px 10px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+            cursor: grab;
+            width: 260px; 
+            transform-origin: center;
+            will-change: transform;
+        }
+
+        .polaroid:hover {
+            z-index: 999 !important;
+            transform: scale(1.1) rotate(0deg) !important; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .polaroid:active {
+            cursor: grabbing;
+            transform: scale(1.05) !important;
+        }
+
+        .media-wrapper {
+            width: 100%;
+            height: 180px; 
+            background: #eee; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .media-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.1); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s;
+        }
+        .play-icon {
+            font-size: 40px;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            opacity: 0.9;
+        }
+        
+        .polaroid:hover .play-overlay { opacity: 0; }
+
+        .polaroid .caption {
+            position: absolute;
+            bottom: 12px;
+            left: 15px;
+            width: calc(100% - 30px);
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .location-stamp {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 14px;
+            color: #999;
+            letter-spacing: 1px;
+        }
+
+        /* 装饰元素 (浅色版) */
+        .decoration {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.05; /* 极淡 */
+            color: #000;
+            font-family: 'BebasNeue', sans-serif;
+        }
+
+        /* =========================================
+           5. 沉浸式影院 (Lightbox)
+           ========================================= */
+        #lightbox {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95);
+            z-index: 4000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #lightbox.active { display: flex; opacity: 1; }
+
+        .lightbox-video-container {
+            width: 80%;
+            max-width: 1000px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .lightbox-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .lightbox-info {
+            margin-top: 20px;
+            text-align: center;
+            color: #333; 
+        }
+        .lb-title { font-family: 'BebasNeue', sans-serif; font-size: 32px; letter-spacing: 2px; }
+        .lb-desc { font-family: 'InstrumentSans-Regular', sans-serif; font-size: 14px; color: #666; margin-top: 5px; }
+
+        .close-lightbox {
+            position: absolute;
+            top: 30px; right: 30px;
+            color: #333;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 5000;
+            transition: transform 0.2s;
+        }
+        .close-lightbox:hover { transform: scale(1.2) rotate(90deg); color: #000; }
+
+    </style>
+</head>
+<body>
+
+    <!-- 返回导航 -->
+    <a href="../index.html" class="nav-back">← BACK TO HOME</a>
+
+    <!-- 1. 闭店挂牌 (遮罩层) -->
+    <div id="sign-container">
+        <div class="sign-rope-top-left"></div>
+        <div class="sign-rope-top-right"></div>
+        
+        <!-- 招牌主体 -->
+        <div class="sign-board" id="sign-board">
+            <div class="sign-text">CLOSED</div>
+            <div class="sign-sub">Gone Hiking...</div>
+            
+            <!-- 拉绳 (挂在招牌下) -->
+            <div class="pull-cord-wrapper" id="pull-trigger">
+                <div class="rope-line" id="rope-line"></div>
+                <div class="rope-handle" id="rope-handle"></div>
+                <!-- 修改提示文案 -->
+                <div class="pull-hint">CLICK TO OPEN</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 桌面容器 (照片墙) -->
+    <div id="desk-container">
+        <div class="decoration" style="top:10%; left:5%; font-size:120px;">WILD</div>
+        <div class="decoration" style="bottom:5%; right:5%; font-size:120px;">FREE</div>
+    </div>
+
+    <!-- 3. 灯箱 -->
+    <div id="lightbox">
+        <div class="close-lightbox">&times;</div>
+        <div class="lightbox-video-container">
+            <video id="lb-video" controls></video>
+        </div>
+        <div class="lightbox-info">
+            <div class="lb-title" id="lb-title">TITLE</div>
+            <div class="lb-desc" id="lb-desc">Location / Date</div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           VLOG 数据源
+           ========================================= */
+        const vlogs = [
+            { 
+                src: '../assets/video/vlog-zhenjiang.mp4', 
+                title: '镇江一日游', 
+                desc: 'Travel Log', 
+                location: 'ZHENJIANG', 
+                x: 15, y: 15, rot: -5 
+            },
+            { 
+                src: '../assets/video/vlog-siguniang.mp4', 
+                title: '四姑娘山双桥沟', 
+                desc: 'Hiking Log', 
+                location: 'SICHUAN', 
+                x: 45, y: 10, rot: 3 
+            },
+            { 
+                src: '../assets/video/vlog-sapu.mp4', 
+                title: '萨普神山冰川', 
+                desc: 'Glacier View', 
+                location: 'TIBET', 
+                x: 75, y: 20, rot: -8 
+            },
+            { 
+                src: '../assets/video/vlog-jiongla.mp4', 
+                title: '藏东秘境炯拉错', 
+                desc: 'Secret Lake', 
+                location: 'TIBET', 
+                x: 20, y: 55, rot: 6 
+            },
+            { 
+                src: '../assets/video/vlog-bear.mp4', 
+                title: '偶遇藏马熊', 
+                desc: 'Wild Life', 
+                location: 'TIBET', 
+                x: 55, y: 50, rot: -2 
+            },
+            { 
+                src: '../assets/video/vlog-dangre.mp4', 
+                title: '当惹雍错湖', 
+                desc: 'Holy Lake', 
+                location: 'TIBET', 
+                x: 80, y: 65, rot: 10 
+            }
+        ];
+
+        const desk = document.getElementById('desk-container');
+        let highestZ = 100;
+
+        // 初始化视频卡片
+        vlogs.forEach((item, index) => {
+            const el = document.createElement('div');
+            el.classList.add('polaroid');
+            
+            const randomX = item.x + (Math.random() * 4 - 2);
+            const randomY = item.y + (Math.random() * 4 - 2);
+            const randomRot = item.rot + (Math.random() * 6 - 3);
+
+            el.style.left = `${randomX}%`;
+            el.style.top = `${randomY}%`;
+            el.style.transform = `rotate(${randomRot}deg)`;
+            el.style.zIndex = index + 1;
+
+            el.innerHTML = `
+                <div class="media-wrapper">
+                    <video src="${item.src}" loop muted playsinline></video>
+                    <div class="play-overlay"><span class="play-icon">▶</span></div>
+                </div>
+                <div class="caption">
+                    <span>${item.title}</span>
+                    <span class="location-stamp">${item.location}</span>
+                </div>
+            `;
+
+            setupCardInteraction(el, item);
+            desk.appendChild(el);
+        });
+
+        /* =========================================
+           点击收起逻辑 (简化版)
+           ========================================= */
+        const signContainer = document.getElementById('sign-container');
+        const pullTrigger = document.getElementById('pull-trigger');
+        const signBoard = document.getElementById('sign-board');
+
+        // 点击拉绳 -> 收起
+        pullTrigger.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止冒泡触发其他事件
+            hideSign();
+        });
+
+        // 点击招牌 -> 也可以收起
+        signBoard.addEventListener('click', () => {
+            hideSign();
+        });
+
+        function hideSign() {
+            // 向上飞走动画
+            signContainer.classList.add('hidden');
+        }
+
+        /* =========================================
+           卡片交互逻辑 (保持不变)
+           ========================================= */
+        function setupCardInteraction(el, data) {
+            const video = el.querySelector('video');
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+            let movedDistance = 0;
+
+            el.addEventListener('mouseenter', () => {
+                if (!isDragging) video.play().catch(()=>{});
+            });
+            el.addEventListener('mouseleave', () => {
+                video.pause();
+                video.currentTime = 0; 
+            });
+
+            el.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                movedDistance = 0;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = el.offsetLeft;
+                initialTop = el.offsetTop;
+                highestZ++;
+                el.style.zIndex = highestZ;
+                el.style.transition = 'none'; 
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            function onMouseMove(e) {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                movedDistance += Math.abs(e.movementX) + Math.abs(e.movementY);
+                el.style.left = `${initialLeft + dx}px`;
+                el.style.top = `${initialTop + dy}px`;
+            }
+
+            function onMouseUp() {
+                isDragging = false;
+                el.style.transition = 'transform 0.2s, box-shadow 0.2s';
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+
+            el.addEventListener('click', () => {
+                if (movedDistance < 5) openLightbox(data);
+            });
+        }
+
+        /* =========================================
+           灯箱逻辑
+           ========================================= */
+        const lightbox = document.getElementById('lightbox');
+        const lbVideo = document.getElementById('lb-video');
+        const lbTitle = document.getElementById('lb-title');
+        const lbDesc = document.getElementById('lb-desc');
+        const closeBtn = document.querySelector('.close-lightbox');
+
+        function openLightbox(data) {
+            lbVideo.src = data.src;
+            lbTitle.innerText = data.title;
+            lbDesc.innerText = data.location; 
+            lightbox.classList.add('active');
+            lbVideo.play().catch(()=>{});
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lbVideo.pause();
+            lbVideo.src = ""; 
+        }
+
+        closeBtn.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+    </script>
+</body>
+</html>

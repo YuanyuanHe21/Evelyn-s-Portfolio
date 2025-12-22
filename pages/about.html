@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who is Evelyn? - About Me</title>
+    
+    <style>
+        /* =========================================
+           1. 字体与基础设置
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('../assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('../assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+
+        :root {
+            /* Day Mode 变量 */
+            --bg-color: #f4f4f4;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --text-sub: #666;
+            --accent: #264653;
+            --highlight: #e9c46a;
+            --bar-bg: #eee;
+            --bar-fill: #2a9d8f;
+        }
+
+        /* Night Mode 变量 */
+        body.night-mode {
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-main: #f0f0f0;
+            --text-sub: #aaa;
+            --accent: #ff0055; /* 警告红 */
+            --highlight: #333;
+            --bar-bg: #444;
+            --bar-fill: #ff0055;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.5s ease;
+        }
+
+        /* 导航 */
+        .nav-back {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 1000;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: opacity 0.3s;
+        }
+        .nav-back:hover { opacity: 0.6; }
+
+        /* =========================================
+           2. 模式切换开关 (Toggle)
+           ========================================= */
+        .toggle-wrapper {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .mode-label {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 20px;
+            color: var(--text-main);
+            letter-spacing: 1px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* 选中状态 */
+        input:checked + .slider { background-color: #ff0055; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* =========================================
+           3. 身份卡片 (Profile Card)
+           ========================================= */
+        .profile-card {
+            width: 800px;
+            height: 500px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        /* 左侧：照片区 */
+        .card-visual {
+            flex: 0.8;
+            background-color: #e0e0e0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+        
+        /* 两个头像叠加，通过 opacity 切换 */
+        #avatar-pro { opacity: 1; position: absolute; z-index: 2; }
+        #avatar-cow { opacity: 0; position: absolute; z-index: 1; transform: scale(0.8); }
+
+        /* 夜间模式头像切换 */
+        body.night-mode #avatar-pro { opacity: 0; }
+        body.night-mode #avatar-cow { opacity: 1; transform: scale(1); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* 标签 */
+        .status-tag {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            z-index: 10;
+        }
+
+        /* 右侧：信息区 */
+        .card-info {
+            flex: 1.2;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-header h1 {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 64px;
+            margin: 0;
+            color: var(--text-main);
+            line-height: 0.9;
+            transition: color 0.5s;
+        }
+        .info-header h2 {
+            font-family: 'InstrumentSans-Regular', sans-serif;
+            font-size: 18px;
+            color: var(--text-sub);
+            margin: 5px 0 30px 0;
+            font-weight: normal;
+            transition: color 0.5s;
+        }
+
+        /* 技能条 */
+        .skill-group {
+            margin-bottom: 30px;
+        }
+        .skill-item {
+            margin-bottom: 15px;
+        }
+        .skill-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .skill-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bar-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .skill-bar-fill {
+            height: 100%;
+            width: 0; /* JS 控制 */
+            background-color: var(--bar-fill);
+            border-radius: 4px;
+            transition: width 0.3s ease-out, background-color 0.5s;
+        }
+
+        /* 底部操作区 */
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+        
+        .action-btn {
+            background: var(--text-main);
+            color: var(--card-bg);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .contact-link {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 14px;
+            border-bottom: 1px solid var(--text-sub);
+            transition: color 0.5s;
+        }
+
+        /* =========================================
+           4. 特效 & 屏蔽提示
+           ========================================= */
+        .emoji-float {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: floatUp 1.5s forwards;
+            z-index: 2000;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+        }
+
+        /* 故障文字效果 */
+        .glitch-text {
+            animation: glitch-anim 0.3s infinite;
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+        /* 屏蔽弹窗 */
+        #block-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            color: #fff;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .block-text {
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #ff0055;
+        }
+        .block-sub {
+            font-family: 'PuHuiTi', sans-serif;
+            font-size: 18px;
+            color: #fff;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 屏蔽提示层 -->
+    <div id="block-overlay">
+        <div class="block-text">NOT FUNNY!</div>
+        <div class="block-sub">不好笑，屏蔽你一晚上。</div>
+        <div style="margin-top: 30px; font-size: 12px; color: #666;">Bye.</div>
+    </div>
+
+    <a href="../index.html" class="nav-back">← BACK</a>
+
+    <!-- 模式切换 -->
+    <div class="toggle-wrapper">
+        <span class="mode-label" id="mode-text">DESIGNER MODE</span>
+        <label class="switch">
+            <input type="checkbox" id="mode-switch">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- 身份卡片 -->
+    <div class="profile-card" id="card">
+        
+        <!-- 左侧：头像 -->
+        <div class="card-visual">
+            <div class="status-tag" id="status-tag">OPEN TO WORK</div>
+            <!-- 专业头像 -->
+            <img src="../assets/images/self.png" id="avatar-pro" class="avatar-img" alt="Pro">
+            <!-- 牛马头像 -->
+            <img src="../assets/images/center-avatar.png" id="avatar-cow" class="avatar-img" alt="Cow">
+        </div>
+
+        <!-- 右侧：信息 -->
+        <div class="card-info">
+            <div class="info-header">
+                <h1 id="name-text">EVELYN HE</h1>
+                <h2 id="role-text">Interdisciplinary Designer</h2>
+            </div>
+
+            <div class="skill-group">
+                
+                <!-- 技能 1 -->
+                <div class="skill-item">
+                    <div class="skill-label">
+                        <span id="skill-1-name">Visual Design</span>
+                        <span id="skill-1-val">90%</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" id="skill-1-bar" style="width: 90%;"></div>
+                    </div>
+                </div>
+
+                <!-- 技能 2 -->
+                <div class="skill-item">
+                    <div class="skill-label">
+                        <span id="skill-2-name">Interaction</span>
+                        <span id="skill-2-val">85%</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" id="skill-2-bar" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <!-- 技能 3 (Sanity) -->
+                <div class="skill-item">
+                    <div class="skill-label">
+                        <span id="skill-3-name">Sanity</span>
+                        <span id="skill-3-val">100%</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-bar-fill" id="skill-3-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="card-footer">
+                <button class="action-btn" id="action-btn">
+                    <span id="btn-icon">☕</span> <span id="btn-text">Buy me a coffee</span>
+                </button>
+                <a href="mailto:2407363427@qq.com" class="contact-link">2407363427@qq.com</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 音效 -->
+    <audio id="sfx-switch" src="../assets/audio/click.mp3"></audio>
+    <audio id="sfx-error" src="../assets/audio/error.mp3"></audio>
+
+    <script>
+        // 0. 访问权限检查 (屏蔽逻辑)
+        const blockUntil = localStorage.getItem('evelyn_blocked_until');
+        if (blockUntil && Date.now() < parseInt(blockUntil)) {
+            document.getElementById('block-overlay').style.display = 'flex';
+            // 3秒后踢回主页
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 3000);
+            throw new Error("User is blocked."); // 停止后续脚本执行
+        }
+
+        const modeSwitch = document.getElementById('mode-switch');
+        const body = document.body;
+        const actionBtn = document.getElementById('action-btn');
+        const btnIcon = document.getElementById('btn-icon');
+        const sfxSwitch = document.getElementById('sfx-switch');
+        const sfxError = document.getElementById('sfx-error');
+
+        // 文本元素
+        const modeText = document.getElementById('mode-text');
+        const statusTag = document.getElementById('status-tag');
+        const nameText = document.getElementById('name-text');
+        const roleText = document.getElementById('role-text');
+        const btnText = document.getElementById('btn-text');
+
+        // 技能条元素
+        const s1n = document.getElementById('skill-1-name');
+        const s1v = document.getElementById('skill-1-val');
+        const s1b = document.getElementById('skill-1-bar');
+
+        const s2n = document.getElementById('skill-2-name');
+        const s2v = document.getElementById('skill-2-val');
+        const s2b = document.getElementById('skill-2-bar');
+
+        const s3n = document.getElementById('skill-3-name');
+        const s3v = document.getElementById('skill-3-val');
+        const s3b = document.getElementById('skill-3-bar');
+
+        // 状态变量
+        let currentSanity = 100;
+
+        // 模式数据
+        const data = {
+            day: {
+                mode: "DESIGNER MODE",
+                status: "OPEN TO WORK",
+                name: "EVELYN HE",
+                role: "Interdisciplinary Designer",
+                btn: "Buy me a coffee",
+                icon: "☕",
+                skills: [
+                    { name: "Visual Design", val: "90%", w: "90%" },
+                    { name: "Interaction", val: "85%", w: "85%" }
+                ]
+            },
+            night: {
+                mode: "COW-HORSE MODE",
+                status: "SOS",
+                name: "NIU MA",
+                role: "Full-time Overtime Machine",
+                btn: "Mock me (嘲笑)",
+                icon: "🤡",
+                skills: [
+                    { name: "Ctrl + C / V", val: "999%", w: "100%" },
+                    { name: "Back Pain", val: "Level Max", w: "100%" }
+                ]
+            }
+        };
+
+        // 更新 Sanity 条
+        function updateSanityUI() {
+            s3b.style.width = currentSanity + '%';
+            s3v.innerText = currentSanity + '%';
+            
+            // 变色逻辑
+            if (currentSanity < 30) {
+                s3b.style.backgroundColor = '#ff0055'; // 危险红
+            } else if (currentSanity < 60) {
+                s3b.style.backgroundColor = '#e9c46a'; // 警告黄
+            } else {
+                s3b.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--bar-fill');
+            }
+        }
+
+        // 切换逻辑
+        modeSwitch.addEventListener('change', () => {
+            if (sfxSwitch) sfxSwitch.play().catch(()=>{});
+
+            if (modeSwitch.checked) {
+                // 进入 Night Mode (牛马模式)
+                body.classList.add('night-mode');
+                updateContent(data.night);
+                
+                // Sanity 初始暴跌
+                currentSanity = 40; 
+                updateSanityUI();
+
+                // 故障效果
+                nameText.classList.add('glitch-text');
+                setTimeout(() => nameText.classList.remove('glitch-text'), 500);
+
+            } else {
+                // 回到 Day Mode
+                body.classList.remove('night-mode');
+                updateContent(data.day);
+                
+                // Sanity 恢复
+                currentSanity = 100;
+                updateSanityUI();
+            }
+        });
+
+        function updateContent(d) {
+            modeText.innerText = d.mode;
+            statusTag.innerText = d.status;
+            nameText.innerText = d.name;
+            roleText.innerText = d.role;
+            btnText.innerText = d.btn;
+            btnIcon.innerText = d.icon;
+
+            // 更新前两个技能
+            s1n.innerText = d.skills[0].name; s1v.innerText = d.skills[0].val; s1b.style.width = d.skills[0].w;
+            s2n.innerText = d.skills[1].name; s2v.innerText = d.skills[1].val; s2b.style.width = d.skills[1].w;
+        }
+
+        // 按钮交互逻辑
+        actionBtn.addEventListener('click', (e) => {
+            const isNight = modeSwitch.checked;
+            
+            // 1. 生成表情包
+            const emojis = isNight ? ['🤡', '👎', '😂', '👻', '💩'] : ['☕', '❤️', '💊', '⚡', '🥪'];
+            const el = document.createElement('div');
+            el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            el.classList.add('emoji-float');
+            
+            const rect = actionBtn.getBoundingClientRect();
+            el.style.left = rect.left + rect.width/2 + 'px';
+            el.style.top = rect.top + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+
+            // 2. Sanity 逻辑
+            if (isNight) {
+                // 嘲笑 -> 扣血
+                currentSanity -= 10;
+                if (currentSanity < 0) currentSanity = 0;
+                updateSanityUI();
+
+                // 播放错误音效
+                if (sfxError && Math.random() > 0.5) {
+                    sfxError.currentTime = 0;
+                    sfxError.play().catch(()=>{});
+                }
+                
+                // 触发屏蔽
+                if (currentSanity <= 10) {
+                    triggerBlock();
+                }
+
+            } else {
+                // 投喂 -> 回血
+                if (currentSanity < 100) {
+                    currentSanity += 10;
+                    if(currentSanity > 100) currentSanity = 100;
+                    updateSanityUI();
+                }
+            }
+        });
+
+        function triggerBlock() {
+            // 显示遮罩
+            document.getElementById('block-overlay').style.display = 'flex';
+            
+            // 写入 LocalStorage (封禁 5 分钟)
+            const banTime = Date.now() + 5 * 60 * 1000;
+            localStorage.setItem('evelyn_blocked_until', banTime);
+
+            // 延迟跳转
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 2500);
+        }
+
+    </script>
+</body>
+</html>

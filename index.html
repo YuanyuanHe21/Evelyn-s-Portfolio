@@ -21,6 +21,11 @@
             font-family: 'BebasNeue';
             src: url('assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
         }
+        /* 新增：粉笔字体 (如果没有可用系统默认手写体代替) */
+        @font-face {
+            font-family: 'ChalkFont';
+            src: local('Chalkboard SE'), local('Comic Sans MS'), sans-serif;
+        }
 
         /* =========================================
            2. 全局基础样式
@@ -71,156 +76,38 @@
         }
 
         /* =========================================
-           3. LOADING 遮罩层样式 (修正版)
+           3. LOADING 遮罩层样式 (保持不变)
            ========================================= */
         #loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #fff;
-            z-index: 9999; /* 最高层级，盖住一切 */
-            display: flex; /* 默认显示，JS控制隐藏 */
+            z-index: 9999;
+            display: flex;
             justify-content: center;
             align-items: center;
             cursor: progress;
         }
 
-        /* Loading页的元素样式 */
-        /* 🔴 修正：确保这里的类名与 HTML 对应 */
-        .loading-header { 
-            position: absolute; 
-            top: 40px; 
-            left: 40px; 
-            font-size: 12px; 
-            line-height: 1.5; 
-            color: #333; 
-            text-align: left;
-        }
-        
-        .status-text { 
-            font-weight: bold; 
-            font-size: 16px; 
-            margin-top: 10px; 
-            display: block; 
-        }
-        
-        .kanji-status { 
-            position: absolute; 
-            top: 30px; 
-            right: 40px; 
-            font-family: 'PuHuiTi', sans-serif; 
-            font-size: 80px; 
-            font-weight: bold; 
-            color: #000; 
-            transition: transform 0.2s; 
-        }
-        
-        .center-stage { 
-            position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 40px; 
-            width: 100%; 
-        }
-        
-        .hero-text { 
-            font-family: 'BebasNeue', sans-serif; 
-            font-size: 60px; 
-            color: #000; 
-            letter-spacing: 2px; 
-        }
-        
-        .cat-container { 
-            position: relative; 
-            width: 300px; 
-            height: 300px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-        }
-        
-        .cat-img { 
-            width: 100%; 
-            height: auto; 
-            object-fit: contain; 
-            transition: opacity 0.1s; 
-        }
-        
-        #cat-crazy { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            opacity: 0; 
-            display: none; 
-        }
-        
-        .loading-percent { 
-            position: absolute; 
-            bottom: -60px; 
-            font-family: 'BebasNeue', sans-serif; 
-            font-size: 24px; 
-            color: #000; 
-        }
-        
-        .loading-footer { 
-            position: absolute; 
-            bottom: 40px; 
-            left: 40px; 
-            font-size: 12px; 
-            color: #666; 
-        }
-        
-        .loading-spinner { 
-            position: absolute; 
-            bottom: 40px; 
-            right: 40px; 
-            width: 30px; 
-            height: 30px; 
-            border: 4px solid #000; 
-            border-radius: 50%; 
-            border-top-color: transparent; 
-            animation: spin 1s linear infinite; 
-        }
+        .loading-header { position: absolute; top: 40px; left: 40px; font-size: 12px; line-height: 1.5; color: #333; text-align: left;}
+        .status-text { font-weight: bold; font-size: 16px; margin-top: 10px; display: block; }
+        .kanji-status { position: absolute; top: 30px; right: 40px; font-family: 'PuHuiTi', sans-serif; font-size: 80px; font-weight: bold; color: #000; transition: transform 0.2s; }
+        .center-stage { position: relative; display: flex; align-items: center; justify-content: center; gap: 40px; width: 100%; }
+        .hero-text { font-family: 'BebasNeue', sans-serif; font-size: 60px; color: #000; letter-spacing: 2px; }
+        .cat-container { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
+        .cat-img { width: 100%; height: auto; object-fit: contain; transition: opacity 0.1s; }
+        #cat-crazy { position: absolute; top: 0; left: 0; opacity: 0; display: none; }
+        .loading-percent { position: absolute; bottom: -60px; font-family: 'BebasNeue', sans-serif; font-size: 24px; color: #000; }
+        .loading-footer { position: absolute; bottom: 40px; left: 40px; font-size: 12px; color: #666; }
+        .loading-spinner { position: absolute; bottom: 40px; right: 40px; width: 30px; height: 30px; border: 4px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* 疯癫特效 */
         .body-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) infinite both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
-        
-        /* 进入按钮 */
-        .enter-btn-overlay { 
-            position: absolute; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 100; 
-            cursor: pointer; 
-            display: none; 
-            justify-content: center; 
-            align-items: center; 
-        }
-        
-        .click-hint { 
-            position: absolute; 
-            bottom: 20%; 
-            background: #000; 
-            color: #fff; 
-            padding: 10px 20px; 
-            font-size: 18px; 
-            font-weight: bold; 
-            transform: rotate(-5deg); 
-            animation: pulse 0.5s infinite alternate; 
-        }
+        .enter-btn-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; cursor: pointer; display: none; justify-content: center; align-items: center; }
+        .click-hint { position: absolute; bottom: 20%; background: #000; color: #fff; padding: 10px 20px; font-size: 18px; font-weight: bold; transform: rotate(-5deg); animation: pulse 0.5s infinite alternate; }
         @keyframes pulse { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(-5deg) scale(1.1); } }
-
-        /* 遮罩炸开动画 */
-        .overlay-explode {
-            animation: explode-fade 0.8s forwards;
-            pointer-events: none;
-        }
-        @keyframes explode-fade {
-            0% { transform: scale(1); opacity: 1; filter: blur(0); }
-            50% { transform: scale(1.5); opacity: 0; filter: blur(10px); }
-            100% { transform: scale(2); opacity: 0; display: none; }
-        }
+        .overlay-explode { animation: explode-fade 0.8s forwards; pointer-events: none; }
+        @keyframes explode-fade { 0% { transform: scale(1); opacity: 1; filter: blur(0); } 50% { transform: scale(1.5); opacity: 0; filter: blur(10px); } 100% { transform: scale(2); opacity: 0; display: none; } }
 
         /* =========================================
            4. 主页其余样式 (保持不变)
@@ -302,25 +189,95 @@
         .toxic-bubble { position: absolute; right: 120%; bottom: 50%; background: #fff; border: 3px solid #000; box-shadow: 4px 4px 0px rgba(0,0,0,1); padding: 8px 14px; border-radius: 8px; font-size: 16px; font-weight: 900; color: #000; white-space: normal; word-break: break-word; width: max-content; max-width: 260px; z-index: 1000; transform-origin: center center; animation: comic-barrage 2.5s ease-out forwards; pointer-events: none; }
         @keyframes comic-barrage { 0% { opacity: 0; transform: translate(0, 20px) scale(0.5); } 10% { opacity: 1; transform: translate(0, 0) scale(1.1); } 20% { transform: translate(0, 0) scale(1); } 80% { opacity: 1; transform: translate(0, -80px) scale(1); } 100% { opacity: 0; transform: translate(0, -120px) scale(0.9); } }
 
+        /* =========================================
+           5. 神经质黑板 (Class Overlay)
+           ========================================= */
+        #class-overlay {
+            position: fixed;
+            top: -100%; /* 初始在上面 */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2b303b; /* 黑板色 */
+            z-index: 5000;
+            transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: none; /* 隐藏鼠标，用粉笔代替 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        #class-overlay.active {
+            top: 0;
+        }
+
+        /* 粉笔光标 */
+        .chalk-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5001;
+            mix-blend-mode: difference;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+            display: none;
+        }
+
+        /* 疯癫文字弹幕 */
+        .crazy-text {
+            position: absolute;
+            font-family: 'ChalkFont', cursive;
+            color: rgba(255,255,255,0.8);
+            font-weight: bold;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: jitter 0.2s infinite;
+        }
+
+        @keyframes jitter {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(2px, 2px) rotate(1deg); }
+            50% { transform: translate(-2px, -1px) rotate(-1deg); }
+            75% { transform: translate(1px, -2px) rotate(0.5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* 黑板上的涂鸦画布 */
+        #scribble-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 退出提示 */
+        .escape-hint {
+            position: absolute;
+            bottom: 30px;
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 32px;
+            color: rgba(255,255,255,0.3);
+            pointer-events: none;
+        }
+
     </style>
 </head>
 
 <body>
 
-<!-- =====================================
-     LOADING OVERLAY (首次访问显示)
-     ===================================== -->
+<!-- LOADING OVERLAY -->
 <div id="loading-overlay">
-    <!-- 🔴 修正：使用 loading-header 类名，与 CSS 对应 -->
     <div class="loading-header">
         Entertainment Design @ Creative Direction by Evelyn-2025<br>
         Small compilation of unposted works, some course work... some personal work.<br>
         COPYRIGHT @ Evelyn 2025
         <span class="status-text" id="status-text">I AM FINE.</span>
     </div>
-
     <div class="kanji-status" id="kanji">静</div>
-
     <div class="center-stage">
         <div class="hero-text">EVELYN 'S</div>
         <div class="cat-container">
@@ -330,39 +287,38 @@
         </div>
         <div class="hero-text">PORTFOLIO</div>
     </div>
-
     <div class="loading-footer">Copyright @ 2025 Evelyn. All rights reserved.</div>
     <div class="loading-spinner" id="spinner"></div>
-
     <div class="enter-btn-overlay" id="enter-btn">
         <div class="click-hint">CLICK TO GET CRAZY!</div>
     </div>
 </div>
 
-<!-- =====================================
-     主页内容 (被 Loading 覆盖)
-     ===================================== -->
+<!-- CLASSROOM OVERLAY (神经质黑板) -->
+<div id="class-overlay">
+    <canvas id="scribble-canvas"></canvas>
+    <div class="chalk-cursor" id="chalk-cursor"></div>
+    <div class="escape-hint">CLICK TO ESCAPE CLASS</div>
+</div>
 
-<!-- 全局背景 -->
+<!-- 主页内容 -->
 <img src="assets/images/clock-bg.png" id="bg-image" alt="bg" onerror="this.style.display='none'">
 
-<!-- 1. 顶部滚动跑马灯 -->
 <div class="header-marquee">
     <div class="marquee-inner">
-        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN" onerror="this.src='https://placehold.co/800x60/EEE/31343C?text=THE+MENTAL+STATE+OF+GRAPHIC+DESIGN';">
-        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN" onerror="this.src='https://placehold.co/800x60/EEE/31343C?text=THE+MENTAL+STATE+OF+GRAPHIC+DESIGN';">
-        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN" onerror="this.src='https://placehold.co/800x60/EEE/31343C?text=THE+MENTAL+STATE+OF+GRAPHIC+DESIGN';">
-        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN" onerror="this.src='https://placehold.co/800x60/EEE/31343C?text=THE+MENTAL+STATE+OF+GRAPHIC+DESIGN';">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
     </div>
 </div>
 
-<!-- 2. 左侧信息栏 -->
 <aside class="left-panel">
     <h1 class="portfolio-title">EVELYN ’S PORTFOLIO</h1>
     <div class="social-icons">
-        <a href="pages/about.html"><img src="assets/images/social-ins.svg" class="social-btn" alt="IG" onerror="this.style.background='#000';this.style.borderRadius='50%'"></a>
-        <a href="pages/about.html"><img src="assets/images/social-link.svg" class="social-btn" alt="In" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
-        <a href="pages/about.html"><img src="assets/images/social-web.svg" class="social-btn" alt="Web" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-ins.png" class="social-btn" alt="IG" onerror="this.style.background='#000';this.style.borderRadius='50%'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-link.png" class="social-btn" alt="In" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-web.png" class="social-btn" alt="Web" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
     </div>
     <p class="intro-text-cn">
         这里是Evelyn He的个人设计网站，<br>
@@ -377,12 +333,10 @@
     <div class="tagline">我开朗的原因：我疯了</div>
 </aside>
 
-<!-- 3. 底部浮动元素 -->
-<div class="footer-float float-left"><img src="assets/images/footer-left.png" alt="Left Footer" onerror="this.src='https://placehold.co/200x80/transparent/000?text=THE+MENTAL+STATE'"></div>
-<div class="footer-float float-center"><img src="assets/images/footer-center.png" alt="Arrow" onerror="this.src='https://placehold.co/60x100/transparent/000?text=↑'"></div>
-<div class="footer-float float-right"><img src="assets/images/footer-right.png" alt="Right Footer" onerror="this.src='https://placehold.co/200x80/transparent/000?text=CRAZY+DESIGNER'"></div>
+<div class="footer-float float-left"><img src="assets/images/footer-left.png" alt="Left Footer"></div>
+<div class="footer-float float-center"><img src="assets/images/footer-center.png" alt="Arrow"></div>
+<div class="footer-float float-right"><img src="assets/images/footer-right.png" alt="Right Footer"></div>
 
-<!-- 4. 右侧时钟 -->
 <div id="clock-wrapper">
     <div id="clock-center"></div>
     <img src="assets/images/hour-hand.png" id="hour-hand" class="hand" alt="hour">
@@ -392,13 +346,17 @@
         <img src="assets/images/center-avatar.png" alt="About Me" onerror="this.src='https://placehold.co/220x220/png?text=COW';">
     </button>
 
-    <!-- 刻度 -->
     <div class="clock-item item-12" data-angle="0" data-target="pages/assistant.html">
         <div class="click-layer"><div class="overtime-wrapper"><span class="label bg-pink">加班</span><div class="sub-icons"><img src="assets/images/icons/canvas.svg"><img src="assets/images/icons/ai.svg"></div></div></div>
     </div>
     <div class="clock-item item-2" data-angle="45" data-target="comics.html"><div class="click-layer"><span class="label bg-gray">改稿</span></div></div>
     <div class="clock-item item-3" data-angle="70" data-target="pages/games.html"><div class="click-layer"><div class="software-block"><img src="assets/images/icons/unity.svg" class="icon"><span class="software-label bg-pink">Unity</span></div></div></div>
-    <div class="clock-item item-4" data-angle="105" data-target="pages/courses.html"><div class="click-layer"><span class="label bg-mint">上课</span><span class="sub">ATTEND CLASS</span></div></div>
+    
+    <!-- 4点: 上课 (Modified) -->
+    <div class="clock-item item-4" data-angle="105" data-target="CLASS_INTERACTION">
+        <div class="click-layer"><span class="label bg-mint">上课</span><span class="sub">ATTEND CLASS</span></div>
+    </div>
+
     <div class="clock-item item-5" data-angle="135" data-target="pages/installations.html"><div class="click-layer"><span class="vertical-text arduino-label bg-mint">Arduino IDE</span><div class="software-block"><img src="assets/images/icons/arduino.svg" class="icon"></div></div></div>
     <div class="clock-item item-6" data-angle="180" data-target="pages/burnout.html"><div class="click-layer"><span class="label bg-gray">燃尽了…</span><img src="assets/images/emoji/burnout.png" class="small-emoji"></div></div>
     <div class="clock-item item-7" data-angle="200" data-target="none"><div class="click-layer"><span class="label vertical-text bg-pink">熬夜</span></div></div>
@@ -414,20 +372,118 @@
 <audio id="sfx-moo" src="assets/audio/moo.mp3" preload="auto"></audio>
 <audio id="sfx-glitch" src="assets/audio/glitch.mp3" preload="auto"></audio>
 <audio id="sfx-explode" src="assets/audio/explode.mp3" preload="auto"></audio>
+<!-- 新增：粉笔音效 -->
+<audio id="sfx-chalk" src="assets/audio/chalk.mp3" preload="auto"></audio>
+<audio id="sfx-bell" src="assets/audio/bell.mp3" preload="auto"></audio>
 
 <!-- JS 逻辑 -->
 <script>
     /* -------------------------------------
-       1. LOADING 逻辑 (首次访问检测)
+       0. 黑板交互逻辑 (Class Overlay)
+       ------------------------------------- */
+    const classOverlay = document.getElementById('class-overlay');
+    const chalkCursor = document.getElementById('chalk-cursor');
+    const sfxChalk = document.getElementById('sfx-chalk');
+    const sfxBell = document.getElementById('sfx-bell');
+    const canvas = document.getElementById('scribble-canvas');
+    const ctx = canvas.getContext('2d');
+    let isClassActive = false;
+
+    // 初始化画布
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // 激活黑板
+    function startClass() {
+        isClassActive = true;
+        classOverlay.classList.add('active');
+        chalkCursor.style.display = 'block';
+        
+        // 播放音效
+        if(sfxChalk) {
+            sfxChalk.currentTime = 0;
+            sfxChalk.loop = true;
+            sfxChalk.play().catch(()=>{});
+        }
+
+        // 自动生成弹幕
+        generateCrazyText();
+    }
+
+    // 退出黑板
+    function endClass() {
+        if(!isClassActive) return;
+        isClassActive = false;
+        
+        // 停止粉笔音效
+        if(sfxChalk) {
+            sfxChalk.pause();
+            sfxChalk.loop = false;
+        }
+        // 播放下课铃
+        if(sfxBell) sfxBell.play().catch(()=>{});
+
+        // 收起黑板
+        classOverlay.classList.remove('active');
+        chalkCursor.style.display = 'none';
+        
+        // 清理画布
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.querySelectorAll('.crazy-text').forEach(el => el.remove());
+        }, 500);
+    }
+
+    // 鼠标绘画
+    classOverlay.addEventListener('mousemove', (e) => {
+        chalkCursor.style.left = e.clientX - 10 + 'px';
+        chalkCursor.style.top = e.clientY - 10 + 'px';
+
+        if(isClassActive && Math.random() > 0.5) {
+            ctx.beginPath();
+            ctx.arc(e.clientX, e.clientY, 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fill();
+        }
+    });
+
+    // 点击退出
+    classOverlay.addEventListener('click', endClass);
+
+    // 自动弹幕生成器
+    function generateCrazyText() {
+        if(!isClassActive) return;
+        
+        const texts = ["听不懂", "???", "GPA", "想睡觉", "别念了", "Deadline", "Zzz...", "Help", "🤯"];
+        const el = document.createElement('div');
+        el.classList.add('crazy-text');
+        el.innerText = texts[Math.floor(Math.random() * texts.length)];
+        
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.fontSize = (20 + Math.random() * 50) + 'px';
+        el.style.transform = `rotate(${Math.random()*60-30}deg)`;
+        
+        classOverlay.appendChild(el);
+        
+        // 继续生成
+        setTimeout(generateCrazyText, 200);
+    }
+
+
+    /* -------------------------------------
+       1. LOADING 逻辑
        ------------------------------------- */
     const loadingOverlay = document.getElementById('loading-overlay');
-    
-    // 检查是否访问过
     if (sessionStorage.getItem('portfolio_visited')) {
-        // 如果访问过，直接隐藏 Loading，显示主页
         loadingOverlay.style.display = 'none';
     } else {
-        // 如果没访问过，开始 Loading 流程
         startLoadingProcess();
     }
 
@@ -443,14 +499,13 @@
         
         let progress = 0;
         let interval = setInterval(() => {
-            progress += 2; // 稍微快一点
-            if(Math.random() > 0.8) progress -= 0.5; // 随机卡顿
+            progress += 2; 
+            if(Math.random() > 0.8) progress -= 0.5;
 
             let displayProgress = Math.floor(progress);
             if (displayProgress > 100) displayProgress = 100;
             percentEl.innerText = displayProgress + '%';
 
-            // 80% 变疯
             if (displayProgress > 80) {
                 if (Math.random() > 0.7) {
                     catCalm.style.opacity = 0;
@@ -470,7 +525,6 @@
 
             if (progress >= 100) {
                 clearInterval(interval);
-                // 完成状态
                 percentEl.innerText = '';
                 catCalm.style.display = 'none';
                 catCrazy.style.display = 'block';
@@ -482,26 +536,16 @@
                 spinner.style.display = 'none';
                 enterBtn.style.display = 'flex';
                 
-                // 绑定进入点击
                 enterBtn.addEventListener('click', () => {
                     const sfxExplode = document.getElementById('sfx-explode');
                     if (sfxExplode) sfxExplode.play().catch(()=>{});
-                    
-                    // 记录已访问
                     sessionStorage.setItem('portfolio_visited', 'true');
-                    
-                    // 炸开动画
                     loadingOverlay.classList.add('overlay-explode');
-                    
-                    // 动画结束后完全移除
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                    }, 800);
+                    setTimeout(() => { loadingOverlay.style.display = 'none'; }, 800);
                 });
             }
         }, 30);
     }
-
 
     /* -------------------------------------
        2. 主页常规逻辑
@@ -583,17 +627,16 @@
         secondHand.style.transition = "none";
     }
 
+    /* --------------------------------------
+       滚轮下滚去公墓
+       -------------------------------------- */
     let isNavigatingToHidden = false;
-
     window.addEventListener('pageshow', (event) => {
         if (event.persisted) {
             isNavigatingToHidden = false;
             document.body.classList.remove('slide-up-out');
             const sfxMoo = document.getElementById("sfx-moo");
-            if (sfxMoo) {
-                sfxMoo.pause();
-                sfxMoo.currentTime = 0;
-            }
+            if (sfxMoo) { sfxMoo.pause(); sfxMoo.currentTime = 0; }
         }
     });
 
@@ -641,11 +684,19 @@
                 if (clickSfx) { clickSfx.currentTime = 0; clickSfx.play().catch(()=>{}); }
                 if (item.id === "pitch-button") { e.preventDefault(); showToxicBubble(randomToxic()); return; }
             });
+            
+            // 点击事件
             item.addEventListener("mouseup", () => {
                 item.classList.remove("pressed");
                 const target = item.dataset.target;
+
+                // 🔴 特殊处理：4点钟的上课
+                if (target === "CLASS_INTERACTION") {
+                    startClass();
+                    return;
+                }
+
                 if (target && target !== "none" && item.id !== "pitch-button") {
-                    // 🔴 恢复直接跳转
                     setTimeout(() => { window.location.href = target; }, 150);
                 }
             });
