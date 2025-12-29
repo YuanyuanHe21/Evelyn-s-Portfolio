@@ -21,28 +21,34 @@
             font-family: 'BebasNeue';
             src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
         }
-        /* 系统字体 (用于模拟后台) */
         @font-face {
             font-family: 'JetBrainsMono';
             src: local('Courier New');
         }
 
+        :root {
+            /* 核心品牌色 */
+            --color-pink: #f9a7e3;      
+            --color-mint: #0ffdbb;
+            --color-gray: #dbdbd9;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0;
+            background-color: #f8f8f8;
             font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
             overflow-x: hidden;
             color: #111;
-            cursor: default; /* 默认鼠标 */
+            cursor: default;
         }
 
-        /* 隐藏默认光标，使用自定义光标 */
+        /* 隐藏默认光标，使用系统光标 */
         body.system-mode {
             cursor: none;
         }
 
-        /* 导航 UI (保持统一) */
+        /* 导航 UI (纯色发光，无硬边) */
         .nav-back {
             position: fixed;
             top: 40px;
@@ -51,15 +57,21 @@
             text-decoration: none;
             font-size: 18px;
             font-weight: bold;
-            mix-blend-mode: difference;
-            color: white; 
+            color: #000;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: opacity 0.3s;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            font-family: 'JetBrainsMono', monospace;
         }
-        .nav-back:hover { opacity: 0.6; }
+        .nav-back:hover { 
+            opacity: 1; 
+            color: var(--color-pink);
+            /* 纯色柔光边缘 */
+            text-shadow: 0 0 10px var(--color-pink);
+        }
 
         .page-title-fixed {
             position: fixed;
@@ -68,10 +80,8 @@
             z-index: 100;
             font-size: 14px;
             color: #666;
-            font-family: 'PuHuiTi', sans-serif;
-            opacity: 0.8;
-            mix-blend-mode: difference;
-            color: white;
+            font-family: 'JetBrainsMono', monospace;
+            font-weight: bold;
         }
 
         /* =========================================
@@ -85,7 +95,7 @@
 
         .section-header {
             margin-bottom: 100px;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #ddd;
             padding-bottom: 40px;
         }
         .section-header h1 {
@@ -93,59 +103,76 @@
             font-size: 80px;
             margin: 0;
             line-height: 0.9;
+            color: #000;
         }
         .section-header p {
             font-size: 18px;
             color: #666;
             margin-top: 10px;
             max-width: 600px;
+            font-family: 'JetBrainsMono', monospace;
         }
 
         /* =========================================
-           3. 项目: CoMerit (核心区域)
+           3. 项目区域通用
            ========================================= */
         .project-section {
-            margin-bottom: 150px;
+            margin-bottom: 180px;
             position: relative;
         }
 
         .project-meta {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            gap: 60px;
             margin-bottom: 60px;
+            align-items: start;
         }
         
+        /* 🔴 修改：项目名称去背景，保持简洁 */
         .project-name {
             font-family: 'BebasNeue', sans-serif;
             font-size: 60px;
-            margin: 0;
+            margin: 10px 0;
+            line-height: 1;
+            color: #000;
         }
         
         .project-desc {
             font-size: 16px;
-            line-height: 1.6;
+            line-height: 1.8;
             color: #333;
         }
         
+        /* 🔴 修改：标签使用高亮背景色 */
         .system-tag {
             display: inline-block;
-            background: #000;
-            color: #0ffdbb; /* 荧光绿 */
             font-family: 'JetBrainsMono', monospace;
             font-size: 12px;
             padding: 4px 8px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #000;
         }
 
-        /* 展板容器 */
+        /* 项目1用薄荷绿背景 */
+        #comerit-zone .system-tag {
+            background-color: var(--color-mint);
+        }
+
+        /* 项目2用粉色背景 */
+        #web-zone .system-tag {
+            background-color: var(--color-pink);
+        }
+
+        /* =========================================
+           Project 1: CoMerit (扫描反色交互)
+           ========================================= */
         .boards-container {
             display: flex;
             justify-content: space-between;
             gap: 20px;
             position: relative;
-            /* 鼠标进入此区域变为“扫描模式” */
         }
 
         .board-wrapper {
@@ -153,7 +180,9 @@
             position: relative;
             overflow: hidden;
             background: #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 8px; 
+            /* 🔴 修改：柔和投影，无硬边 */
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
             transition: transform 0.3s;
         }
         
@@ -165,53 +194,50 @@
             width: 100%;
             height: auto;
             display: block;
-            /* 默认状态稍微降低饱和度，模拟“未被激活” */
-            filter: grayscale(20%);
-            transition: filter 0.3s;
+            /* 恢复正常显示，交互由光标负责 */
         }
 
-        /* =========================================
-           4. 交互：系统光标与扫描仪
-           ========================================= */
-        
-        /* 扫描仪 (跟随鼠标的 div) */
+        /* --- 扫描光标 (核心修复) --- */
         #system-cursor {
             position: fixed;
             top: 0; left: 0;
-            width: 100px; height: 100px; /* 扫描范围 */
-            border: 2px solid #0ffdbb; /* 荧光绿边框 */
+            width: 120px; height: 120px; 
+            border: 1px solid var(--color-mint); 
+            border-radius: 50%;
             pointer-events: none;
             z-index: 999;
-            display: none; /* 默认隐藏，进入区域显示 */
-            mix-blend-mode: difference; /* 核心：反色效果 */
+            display: none; 
             transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: invert(1); /* 核心：反转色彩 */
+            
+            /* 🔴 核心修复：使用反色滤镜实现 X-Ray 效果 */
+            backdrop-filter: invert(1) contrast(1.2);
+            background: rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.2);
         }
 
-        /* 十字准星 */
         #system-cursor::before, #system-cursor::after {
             content: '';
             position: absolute;
-            background: #0ffdbb;
+            background: var(--color-pink);
         }
-        #system-cursor::before { top: 50%; left: 0; width: 100%; height: 1px; } /* 横线 */
-        #system-cursor::after { left: 50%; top: 0; width: 1px; height: 100%; } /* 竖线 */
+        #system-cursor::before { top: 50%; left: 10%; width: 80%; height: 1px; } 
+        #system-cursor::after { left: 50%; top: 10%; width: 1px; height: 80%; } 
 
-        /* 浮动数据 Tag */
         #cursor-data {
             position: absolute;
             top: -25px;
-            left: 0;
-            color: #0ffdbb;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #000;
             font-family: 'JetBrainsMono', monospace;
             font-size: 10px;
             white-space: nowrap;
-            background: #000;
-            padding: 2px 4px;
+            background: var(--color-mint);
+            padding: 2px 6px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* 装饰网格线 (System Background) */
         .system-grid {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -224,24 +250,30 @@
         }
 
         /* =========================================
-           5. Project: Portfolio Web
+           Project 2: Portfolio Web (修复显示)
            ========================================= */
         .web-preview {
             width: 100%;
-            height: 600px;
+            height: 700px; /* 增加高度 */
             background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border-radius: 12px;
+            border: 1px solid #eee;
             overflow: hidden;
             position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.05); /* 柔和投影 */
+            transition: box-shadow 0.3s;
         }
         
+        .web-preview:hover {
+            box-shadow: 0 30px 80px rgba(0,0,0,0.1);
+        }
+        
+        /* 🔴 修复：确保 iframe 填充容器 */
         .web-preview iframe {
             width: 100%;
             height: 100%;
             border: none;
-            transform: scale(1);
-            transform-origin: top left;
+            display: block;
         }
 
     </style>
@@ -257,7 +289,7 @@
 
     <!-- 自定义扫描光标 -->
     <div id="system-cursor">
-        <div id="cursor-data">ID: NULL | SCORE: 00</div>
+        <div id="cursor-data">ID: NULL</div>
     </div>
 
     <div class="container">
@@ -270,7 +302,7 @@
         <section class="project-section" id="comerit-zone">
             <div class="project-meta">
                 <div>
-                    <span class="system-tag">SYSTEM_STATUS: ONLINE</span>
+                    <span class="system-tag">SYSTEM: Future Campus</span>
                     <h2 class="project-name">CoMerit</h2>
                     <p style="font-family:'JetBrainsMono', monospace; font-size:12px; color:#888; margin-top:5px;">
                         INTELLIGENT PERFORMANCE & SCORING SYSTEM
@@ -279,11 +311,11 @@
                 <div class="project-desc">
                     <p><strong>一个发生在未来校园中的智能绩效与评分系统。</strong></p>
                     <p>在这个设定里，学生的学习表现、社交行为、情绪倾向都会被持续量化和评估。系统被包装成一种“智能公平”，但实际上，算法的标准会反过来塑造人的行为和身份。</p>
-                    <p>这不是一个单纯讨论“科技好或不好”的项目，而是想讨论：当算法开始参与定义“优秀”，人和系统之间到底是一种共生，还是一种不对等的关系。</p>
+                    <p>这是一个关于“共生与异化”的交互实验。</p>
                 </div>
             </div>
 
-            <!-- 展板区域 (鼠标进入这里触发扫描特效) -->
+            <!-- 展板区域 -->
             <div class="boards-container">
                 <!-- Board 1 -->
                 <div class="board-wrapper">
@@ -301,19 +333,19 @@
         </section>
 
         <!-- Project 2: This Website -->
-        <section class="project-section">
+        <section class="project-section" id="web-zone">
             <div class="project-meta">
                 <div>
-                    <span class="system-tag">CURRENT_VIEW</span>
+                    <span class="system-tag">CURRENT VIEW</span>
                     <h2 class="project-name">Portfolio Web</h2>
                 </div>
                 <div class="project-desc">
-                    <p>你正在浏览的这个网站本身也是我的交互设计作品之一。它试图通过非线性的导航（时钟）和充满情绪化的微交互（弹幕、故障艺术），来打破传统作品集的枯燥展示。</p>
+                    <p>你正在浏览的这个网站本身也是我的交互设计作品之一。它试图通过非线性的导航和充满情绪化的微交互，打破传统作品集的枯燥展示。</p>
                 </div>
             </div>
             
             <div class="web-preview">
-                <!-- 简单的嵌套展示，产生一种“我在看我看的东西”的错觉 -->
+                <!-- 🔴 修复：指向正确的 index.html (在 pages 目录外) -->
                 <iframe src="../index.html"></iframe>
             </div>
         </section>
@@ -329,25 +361,12 @@
         const activeZone = document.getElementById('comerit-zone');
         const body = document.body;
 
-        // 随机生成“算法数据”
         function updateData() {
             const score = (Math.random() * 100).toFixed(1);
             const id = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-            const status = Math.random() > 0.8 ? 'RISK' : 'NORMAL';
-            
-            cursorData.innerText = `ID:${id} | EVAL:${score} | ${status}`;
-            
-            // 如果分数低，显示红色警告色（通过改变边框颜色）
-            if(score < 60) {
-                cursor.style.borderColor = '#ff0055';
-                cursorData.style.color = '#ff0055';
-            } else {
-                cursor.style.borderColor = '#0ffdbb';
-                cursorData.style.color = '#0ffdbb';
-            }
+            cursorData.innerText = `ID:${id} | EVAL: ${score}`;
         }
 
-        // 监听鼠标移动
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX;
             const y = e.clientY;
@@ -356,7 +375,6 @@
             cursor.style.left = `${x}px`;
             cursor.style.top = `${y}px`;
 
-            // 检查是否在 CoMerit 区域内
             const rect = activeZone.getBoundingClientRect();
             const isInZone = (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom);
 
@@ -364,12 +382,12 @@
                 cursor.style.display = 'block';
                 body.classList.add('system-mode'); // 隐藏默认鼠标
                 
-                // 频繁更新数据，模拟计算感
-                if(Math.random() > 0.5) updateData();
+                // 频繁更新数据
+                if(Math.random() > 0.8) updateData();
                 
             } else {
                 cursor.style.display = 'none';
-                body.classList.remove('system-mode'); // 恢复默认鼠标
+                body.classList.remove('system-mode'); 
             }
         });
 

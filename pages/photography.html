@@ -22,6 +22,12 @@
             src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
         }
 
+        :root {
+            /* 核心品牌色 */
+            --color-pink: #f9a7e3;      
+            --color-mint: #0ffdbb;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -55,9 +61,15 @@
             align-items: center;
             gap: 10px;
             opacity: 0.6;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
         }
-        .nav-back:hover { opacity: 1; }
+        
+        /* 🔴 修改：薄荷绿发光悬停效果 */
+        .nav-back:hover { 
+            opacity: 1; 
+            color: var(--color-mint);
+            text-shadow: 0 0 10px rgba(15, 253, 187, 0.8);
+        }
 
         /* =========================================
            2. 闭店挂牌 (初始遮挡状态)
@@ -374,7 +386,6 @@
             <div class="pull-cord-wrapper" id="pull-trigger">
                 <div class="rope-line" id="rope-line"></div>
                 <div class="rope-handle" id="rope-handle"></div>
-                <!-- 修改提示文案 -->
                 <div class="pull-hint">CLICK TO OPEN</div>
             </div>
         </div>

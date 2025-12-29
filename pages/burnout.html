@@ -25,7 +25,6 @@
         body {
             margin: 0;
             padding: 0;
-            /* 改回主页的米灰色背景 */
             background-color: #f4f4f4; 
             font-family: 'InstrumentSans-Regular', sans-serif;
             overflow: hidden; 
@@ -42,7 +41,7 @@
             --color-black: #000000;
         }
 
-        /* 背景装饰文字 (风格化) */
+        /* 背景装饰文字 */
         .bsod-bg {
             position: absolute;
             top: 50%;
@@ -50,7 +49,7 @@
             transform: translate(-50%, -50%);
             width: 100%;
             text-align: center;
-            color: rgba(0,0,0,0.03); /* 极淡的黑色水印 */
+            color: rgba(0,0,0,0.03);
             font-family: 'BebasNeue', sans-serif;
             font-size: 200px;
             line-height: 0.9;
@@ -73,7 +72,7 @@
             background: #fff;
             padding: 10px 20px;
             border: 3px solid #000;
-            box-shadow: 4px 4px 0px #000; /* 硬阴影风格 */
+            box-shadow: 4px 4px 0px #000;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
         }
@@ -83,30 +82,30 @@
         }
 
         /* =========================================
-           2. 现代波普风格窗口 (Pop/Glitch Style)
+           2. 现代波普风格窗口 (Mini Version)
            ========================================= */
         .window {
             position: absolute;
             background: #fff;
-            border: 3px solid #000; /* 粗黑边框 */
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.15); /* 更有质感的硬阴影 */
+            border: 2px solid #000; /* 边框稍微细一点点 */
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.15); /* 阴影也稍微收敛 */
             display: flex;
             flex-direction: column;
-            width: 320px;
+            width: 180px; /* 🔴 修改：宽度变小 */
             z-index: 10;
-            transition: transform 0.05s; /* 微颤动 */
+            transition: transform 0.05s;
         }
 
         .title-bar {
-            padding: 8px 12px;
+            padding: 4px 8px; /* 🔴 修改：内边距减小 */
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: move;
-            border-bottom: 3px solid #000;
+            border-bottom: 2px solid #000;
         }
 
-        /* 不同的标题栏颜色 */
+        /* 标题栏颜色 */
         .bg-pink { background-color: var(--color-pink); }
         .bg-mint { background-color: var(--color-mint); }
         .bg-black { background-color: var(--color-black); color: #fff; }
@@ -116,16 +115,19 @@
         .title-text {
             color: #000;
             font-family: 'BebasNeue', sans-serif;
-            font-size: 20px;
+            font-size: 14px; /* 🔴 修改：字号变小 */
             letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .btn-close {
-            width: 20px;
-            height: 20px;
+            width: 16px; /* 🔴 修改：按钮变小 */
+            height: 16px;
             border: 2px solid #000;
-            font-size: 16px;
-            line-height: 16px;
+            font-size: 12px;
+            line-height: 12px;
             text-align: center;
             font-weight: bold;
             cursor: pointer;
@@ -146,7 +148,7 @@
             justify-content: center;
             align-items: center;
             background: #fff;
-            min-height: 150px;
+            min-height: 100px; /* 🔴 修改：最小高度变小 */
             position: relative;
             overflow: hidden;
         }
@@ -158,19 +160,12 @@
             pointer-events: none;
         }
 
-        .window-content video {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* 拖拽留下的残影类 */
+        /* 拖拽残影 */
         .trail {
             position: absolute;
             opacity: 0.3;
             z-index: 5;
             pointer-events: none;
-            /* 残影去除阴影，只留边框，显得更轻量 */
             box-shadow: none !important; 
             border: 2px solid #000 !important;
             background: transparent !important;
@@ -178,7 +173,7 @@
         .trail .title-bar { border-bottom: 2px solid #000; opacity: 0.5; }
         .trail .window-content { opacity: 0.2; }
 
-        /* 底部任务栏区域 */
+        /* 底部任务栏 */
         .taskbar {
             position: fixed;
             bottom: 30px;
@@ -193,7 +188,7 @@
             align-items: center;
             gap: 20px;
             z-index: 2000;
-            border-radius: 50px; /* 圆角胶囊形状 */
+            border-radius: 50px;
         }
         
         .start-btn {
@@ -217,13 +212,13 @@
             letter-spacing: 1px;
         }
 
-        /* 错误弹窗的特殊样式 */
+        /* 错误弹窗样式 */
         .error-msg {
             font-family: 'InstrumentSans-Regular', sans-serif;
             font-weight: bold;
-            font-size: 24px;
+            font-size: 16px; /* 🔴 修改：字号变小 */
             text-align: center;
-            padding: 30px;
+            padding: 20px;
         }
 
     </style>
@@ -242,39 +237,30 @@
 
     <!-- 桌面区域 -->
     <div id="desktop">
+        <!-- 初始窗口：这里不再放视频窗口 -->
         
-        <!-- 初始窗口 1: 视频 -->
-        <div class="window" id="video-1" style="left: 20vw; top: 15vh; width: 400px;">
-            <div class="title-bar bg-pink">
-                <span class="title-text">MOOD.MP4</span>
-                <div class="btn-close">×</div>
-            </div>
-            <div class="window-content">
-                <video autoplay loop muted playsinline src="../assets/video/meme.mp4" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\'padding:20px\'>VIDEO FILE MISSING</div>'"></video>
-            </div>
-        </div>
-
-        <!-- 初始窗口 2: 纯文本报错 -->
-        <div class="window" id="error-1" style="left: 60vw; top: 30vh; width: 300px;">
+        <!-- 初始窗口 1: 纯文本报错 -->
+        <div class="window" id="error-init" style="left: 50vw; top: 30vh; width: 200px;">
             <div class="title-bar bg-black">
                 <span class="title-text">WARNING</span>
                 <div class="btn-close">×</div>
             </div>
             <div class="window-content">
                 <div class="error-msg">
-                    I need<br>Sleep.<br>Now.
+                    Brain.exe<br>Stopped Working.
                 </div>
             </div>
         </div>
 
-        <!-- 初始窗口 3: 图片 -->
-        <div class="window" id="meme-1" style="left: 40vw; top: 50vh;">
+        <!-- 初始窗口 2: 图片 (随机) -->
+        <div class="window" id="meme-init" style="left: 30vw; top: 40vh;">
             <div class="title-bar bg-mint">
                 <span class="title-text">My_Brain.png</span>
                 <div class="btn-close">×</div>
             </div>
             <div class="window-content">
-                <img src="../assets/images/meme-01.png" alt="Meme" onerror="this.src='https://placehold.co/300x250/fff/000?text=MEME+IMAGE'">
+                <!-- 占位符，JS加载后会自动随机生成更多 -->
+                <img src="https://placehold.co/180x150/fff/000?text=LOADING..." alt="Meme">
             </div>
         </div>
 
@@ -327,7 +313,10 @@
                 initialLeft = win.offsetLeft;
                 initialTop = win.offsetTop;
                 
-                // 残影生成频率略微降低，避免太乱
+                highestZ++;
+                win.style.zIndex = highestZ;
+                
+                // 残影生成
                 trailInterval = setInterval(() => createTrail(win), 80); 
                 
                 document.addEventListener('mousemove', onMouseMove);
@@ -349,7 +338,7 @@
                 document.removeEventListener('mouseup', onMouseUp);
             }
 
-            // 关闭按钮逻辑 (恶搞)
+            // 关闭按钮逻辑
             closeBtn.addEventListener('click', (e) => {
                 e.stopPropagation(); 
                 
@@ -367,7 +356,7 @@
             });
         }
 
-        // 2. 残影生成 (风格化)
+        // 2. 残影生成
         function createTrail(targetWin) {
             const rect = targetWin.getBoundingClientRect();
             const clone = targetWin.cloneNode(true); 
@@ -380,7 +369,7 @@
             clone.style.zIndex = targetWin.style.zIndex - 1;
             clone.id = '';
             
-            // 移除视频，只留空壳，减少性能消耗
+            // 移除可能存在的视频内容
             const video = clone.querySelector('video');
             if(video) video.remove();
 
@@ -398,18 +387,20 @@
             const win = document.createElement('div');
             win.classList.add('window');
             
-            const x = Math.random() * (window.innerWidth - 350) + 20;
-            const y = Math.random() * (window.innerHeight - 300) + 20;
+            // 🔴 随机范围：屏幕安全区域
+            const x = Math.random() * (window.innerWidth - 200) + 20;
+            const y = Math.random() * (window.innerHeight - 200) + 20;
             
             win.style.left = `${x}px`;
             win.style.top = `${y}px`;
             win.style.zIndex = ++highestZ;
 
-            const isText = Math.random() > 0.6;
             const randomColorClass = headerColors[Math.floor(Math.random() * headerColors.length)];
             
+            const isText = Math.random() > 0.8;
+            
             if (isText) {
-                const phrases = ["404 BRAIN NOT FOUND", "PLEASE SLEEP", "DEADLINE IS COMING", "CTRL+Z", "HELP ME", "NOT RESPONDING"];
+                const phrases = ["404 BRAIN NOT FOUND", "PLEASE SLEEP", "DEADLINE IS COMING", "CTRL+Z", "HELP ME", "NOT RESPONDING", "FATAL ERROR", "SYSTEM CRASH"];
                 const phrase = phrases[Math.floor(Math.random() * phrases.length)];
                 
                 win.innerHTML = `
@@ -422,16 +413,18 @@
                     </div>
                 `;
             } else {
-                // 随机图片 (请替换为您真实的 meme 路径)
-                // 这里假设您有 meme-01.png 到 meme-05.png
-                const randomImgNum = Math.floor(Math.random() * 2) + 1; // 示例只有1-2
+                // 随机选择 meme-01.jpg 到 meme-18.jpg
+                const totalMemes = 18; 
+                const randomImgNum = Math.floor(Math.random() * totalMemes) + 1;
+                const paddedNum = randomImgNum.toString().padStart(2, '0'); 
+                
                 win.innerHTML = `
                     <div class="title-bar ${randomColorClass}">
-                        <span class="title-text">meme_0${randomImgNum}.jpg</span>
+                        <span class="title-text">meme_${paddedNum}.jpg</span>
                         <div class="btn-close">×</div>
                     </div>
                     <div class="window-content">
-                        <img src="../assets/images/meme-0${randomImgNum}.png" alt="Meme" onerror="this.src='https://placehold.co/300x200/fff/000?text=NEW+MEME'">
+                        <img src="../assets/images/meme-${paddedNum}.jpg" alt="Meme ${paddedNum}" onerror="this.src='https://placehold.co/180x150/fff/000?text=MEME-${paddedNum}'">
                     </div>
                 `;
             }
@@ -448,7 +441,14 @@
                 now.getMinutes().toString().padStart(2,'0');
         }, 1000);
 
-        initWindows();
+        // 页面加载时自动弹出 3 个窗口
+        window.addEventListener('load', () => {
+            initWindows();
+            // 延时一点弹出更多，制造节奏感
+            setTimeout(addRandomWindow, 300);
+            setTimeout(addRandomWindow, 600);
+            setTimeout(addRandomWindow, 900);
+        });
 
     </script>
 </body>

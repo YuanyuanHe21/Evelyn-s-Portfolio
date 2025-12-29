@@ -22,6 +22,13 @@
             src: url('../assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
         }
 
+        :root {
+            /* 核心品牌色 */
+            --color-pink: #f9a7e3;      
+            --color-mint: #0ffdbb;
+            --color-gray: #dbdbd9;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -31,7 +38,7 @@
             color: #000;
         }
 
-        /* 导航 UI */
+        /* 导航 UI (纯色边缘发光) */
         .nav-back {
             position: fixed;
             top: 40px;
@@ -40,27 +47,32 @@
             text-decoration: none;
             font-size: 18px;
             font-weight: bold;
-            mix-blend-mode: difference;
-            color: white; 
+            color: #000; 
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
+            opacity: 0.7;
         }
-        .nav-back:hover { opacity: 0.6; }
+        /* 悬停发光效果 */
+        .nav-back:hover { 
+            opacity: 1; 
+            color: var(--color-mint); 
+            text-shadow: 0 0 10px rgba(15, 253, 187, 0.8);
+        }
 
+        /* 🔴 修改：右上角标题改为灰色字体，无背景 */
         .page-title-fixed {
             position: fixed;
             top: 40px;
             right: 40px;
             z-index: 100;
             font-size: 14px;
-            color: #666;
+            color: #666; /* 灰色字体 */
             font-family: 'PuHuiTi', sans-serif;
-            opacity: 0.8;
-            mix-blend-mode: difference;
-            color: white;
+            font-weight: bold;
+            /* 移除背景色和padding */
         }
 
         /* =========================================
@@ -80,6 +92,7 @@
             font-size: 80px;
             margin: 0;
             line-height: 0.9;
+            color: #000;
         }
         .section-header p {
             font-size: 18px;
@@ -108,56 +121,56 @@
         }
 
         /* =========================================
-           3. 游戏交互区域
+           3. 游戏交互区域 (去除硬边)
            ========================================= */
         .game-visual {
             flex: 1.5;
             height: 450px;
             background: #fff;
-            border-radius: 16px;
+            border-radius: 12px; /* 圆角 */
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            /* 柔和投影 */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
             cursor: pointer;
         }
-
+        
         .game-visual img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
             pointer-events: none;
+            position: relative; 
+            z-index: 0;
         }
 
-        /* 交互提示文字 */
+        /* 🔴 修改：交互提示文字改为白底黑字 */
         .interaction-hint {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.9); /* 白底 */
+            color: #333; /* 黑字 */
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
-            color: #333;
             pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            opacity: 0.8;
+            opacity: 0.9;
             transition: opacity 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
             z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* 加一点阴影防止在白图上看不清 */
         }
         .game-visual:hover .interaction-hint {
             opacity: 0; 
         }
 
         /* --- Game 1: 动点P --- */
-        #visual-p {
-            position: relative;
-            transform-style: preserve-3d;
-        }
+        #visual-p { position: relative; transform-style: preserve-3d; }
         .balance-ball {
             position: absolute;
             top: 50%; left: 50%; 
@@ -165,14 +178,11 @@
             background: #000;
             border-radius: 50%;
             transform: translate(-50%, -50%); 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             pointer-events: none;
+            z-index: 2;
         }
-        
-        .balance-ball.dropping {
-            animation: drop-bounce 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
+        .balance-ball.dropping { animation: drop-bounce 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes drop-bounce {
             0% { transform: translate(var(--drop-x), var(--drop-y)); }
             40% { transform: translate(var(--drop-x), calc(-50% + 205px)); } 
@@ -186,92 +196,121 @@
         #visual-human {
             background-color: #111;
             color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'PuHuiTi', serif;
-            font-weight: bold;
-            font-size: 60px;
-            letter-spacing: 20px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'PuHuiTi', serif; font-weight: bold; font-size: 60px; letter-spacing: 20px;
+            position: relative;
         }
-        .element-char {
-            transition: color 0.5s, text-shadow 0.5s;
-            cursor: default;
+        .element-char { 
+            transition: color 0.3s, text-shadow 0.3s; 
+            cursor: pointer; 
+            position: relative; 
+            z-index: 2;
+            display: inline-block;
         }
         .element-char:hover { transform: scale(1.2); }
-        .char-water { color: #8fd3f4; }
-        .char-wood { color: #a8edea; }
+        .char-water { color: #8fd3f4; } 
+        .char-wood { color: #a8edea; } 
         .char-fire { color: #ff9a9e; }
+        
+        /* 元素粒子 */
+        .element-particle {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: floatUpFade 1.5s forwards;
+            z-index: 1;
+        }
+        @keyframes floatUpFade {
+            0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+            100% { opacity: 0; transform: translate(var(--dx), -100px) scale(1.2); }
+        }
 
         /* --- Game 3: 小猫咪 --- */
         #visual-cat { background-color: #fff; }
         .cat-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            mix-blend-mode: hard-light;
-            clip-path: circle(0px at 0 0);
-            pointer-events: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); mix-blend-mode: hard-light;
+            clip-path: circle(0px at 0 0); pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 5;
         }
-        .cat-cursor-hint {
-            color: #fff;
-            font-weight: bold;
-            font-size: 24px;
-        }
+        .cat-cursor-hint { color: #fff; font-weight: bold; font-size: 24px; }
 
         /* --- Game 4: 稻荷弹射 --- */
-        #visual-inari {
-            transform-origin: center bottom;
+        #visual-inari { 
+            position: relative; 
+            cursor: crosshair;
         }
-        #visual-inari.snapping {
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .inari-ball {
+            position: absolute;
+            width: 30px; height: 30px;
+            background: #a8edea; /* 荧光蓝/薄荷色 */
+            border: 3px solid #000;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(168, 237, 234, 0.8);
+            z-index: 5;
+            left: 50%; top: 80%;
         }
 
         /* =========================================
-           4. 游戏信息区域
+           4. 游戏信息区域 (仅标题带背景色)
            ========================================= */
         .game-info { flex: 1; padding: 20px; }
+        
         .game-tag {
             font-size: 12px;
             font-weight: bold;
             color: #888;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             display: block;
         }
+
+        /* 游戏标题：简单的背景色，无边框无阴影 */
         .game-title {
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 20px;
             line-height: 1.2;
+            display: inline-block;
+            padding: 4px 12px;
+            color: #000;
+            border-radius: 4px; /* 柔和圆角 */
         }
+        
+        /* 标题颜色交替 */
+        .game-card:nth-child(odd) .game-title { background-color: var(--color-pink); }
+        .game-card:nth-child(even) .game-title { background-color: var(--color-mint); }
+
         .game-desc {
             font-size: 16px;
             line-height: 1.6;
             color: #555;
             margin-bottom: 30px;
+            margin-top: 10px;
         }
+        
+        /* 下载按钮：简洁黑色风格 */
         .download-btn {
             display: inline-block;
-            padding: 12px 24px;
-            background: #000;
+            padding: 12px 28px;
+            background-color: #000;
             color: #fff;
             text-decoration: none;
             font-size: 14px;
             font-weight: bold;
-            border-radius: 4px;
+            border-radius: 30px; /* 胶囊圆角 */
             transition: all 0.2s;
             cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+
         .download-btn:hover {
             background: #333;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
         /* =========================================
@@ -285,7 +324,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.6);
+            background-color: rgba(255,255,255,0.8);
             backdrop-filter: blur(5px);
             align-items: center;
             justify-content: center;
@@ -295,13 +334,14 @@
         }
         .modal-content {
             background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
+            /* 去掉黑边和粉阴影 */
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            padding: 50px;
             text-align: center;
             position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             max-width: 400px;
             width: 80%;
+            border-radius: 12px;
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes popIn {
@@ -312,9 +352,8 @@
             position: absolute;
             top: 15px;
             right: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            color: #aaa;
+            font-size: 24px;
+            color: #ccc;
             cursor: pointer;
             transition: color 0.2s;
         }
@@ -326,6 +365,7 @@
             font-size: 32px;
             letter-spacing: 1px;
             margin-bottom: 20px;
+            color: #000;
         }
         .modal-content p {
             font-size: 16px;
@@ -337,12 +377,12 @@
             font-size: 20px;
             color: #000;
             display: block;
-            margin: 10px 0;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 4px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f4f4f4; /* 浅灰底 */
+            border-radius: 8px;
             font-family: 'InstrumentSans-Regular', monospace;
-            user-select: text; /* 允许复制 */
+            user-select: text; 
         }
         .en-hint {
             font-size: 14px !important;
@@ -374,7 +414,7 @@
                     <div class="interaction-hint">● Hover to Move Ball</div>
                 </div>
                 <div class="game-info">
-                    <span class="game-tag">2D Platformer / Physics</span>
+                    <span class="game-tag">2D Platformer / Physics</span><br>
                     <h2 class="game-title">动点p的奇妙旅程</h2>
                     <p class="game-desc">
                         一款以动量守恒为核心玩法的平台游戏。你不再直接控制角色跳跃，而是控制脚下的平台倾斜与移动，利用物理惯性将“点P”甩向终点。
@@ -393,7 +433,7 @@
                     <div class="interaction-hint" style="color: #fff; background: rgba(0,0,0,0.5);">Hover Characters</div>
                 </div>
                 <div class="game-info">
-                    <span class="game-tag">GameJam / Puzzle</span>
+                    <span class="game-tag">GameJam / Puzzle</span><br>
                     <h2 class="game-title">人，移动 (Human, Move)</h2>
                     <p class="game-desc">
                         文字派 GameJam 作品。游戏以“水生木，木生火，火生水”及“水克火”等文字含义为核心机制。玩家需要利用汉字的物理属性（如“木”能浮水，“火”能烧木）来解开谜题。
@@ -412,7 +452,7 @@
                     <div class="interaction-hint">Hover to Reveal</div>
                 </div>
                 <div class="game-info">
-                    <span class="game-tag">Maze / Color Theory</span>
+                    <span class="game-tag">Maze / Color Theory</span><br>
                     <h2 class="game-title">小猫咪你逃不出我的手掌心的哇咔咔</h2>
                     <p class="game-desc">
                         2D 迷宫游戏，核心玩法是“色彩叠加”。只有当玩家拖动 Meme 猫猫滑片，使其颜色与迷宫路径正确叠加时，隐藏的道路才会显现。
@@ -425,10 +465,12 @@
             <div class="game-card">
                 <div class="game-visual" id="visual-inari">
                     <img src="../assets/images/game-inari.png" alt="Inari" onerror="this.src='https://placehold.co/800x600/a8edea/333?text=Inari+Catapult'">
-                    <div class="interaction-hint">↕ Drag & Release</div>
+                    <!-- 简易弹球 -->
+                    <div class="inari-ball" id="inari-ball"></div>
+                    <div class="interaction-hint">Drag Ball to Shoot</div>
                 </div>
                 <div class="game-info">
-                    <span class="game-tag">Action / Pinball</span>
+                    <span class="game-tag">Action / Pinball</span><br>
                     <h2 class="game-title">稻荷弹射</h2>
                     <p class="game-desc">
                         在传统的鼠标交互上做文章。按住鼠标向后拖拽，将鼠标光标本身作为“弹珠”发射出去！模拟草种播撒，在水潭里铺草并击退怪物。
@@ -459,31 +501,26 @@
         const closeBtn = document.querySelector('.close-modal');
         const downloadBtns = document.querySelectorAll('.download-btn');
 
-        // 为所有下载按钮绑定弹窗事件
         downloadBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                e.preventDefault(); // 阻止链接默认跳转
+                e.preventDefault(); 
                 modal.classList.add('show');
             });
         });
 
-        // 关闭按钮
         closeBtn.addEventListener('click', () => {
             modal.classList.remove('show');
         });
 
-        // 点击背景关闭
         window.addEventListener('click', (e) => {
             if (e.target == modal) {
                 modal.classList.remove('show');
             }
         });
 
-
         /* =========================================
-           2. 游戏卡片交互逻辑 (保持不变)
+           2. 游戏卡片交互逻辑
            ========================================= */
-        
         // Game 1: 动点P
         const cardP = document.getElementById('visual-p');
         const ballP = document.getElementById('ball-p');
@@ -513,6 +550,41 @@
             ballP.classList.add('dropping');
         });
 
+        // Game 2: 人，移动 (飘浮图标)
+        function createParticle(type, container) {
+            const icons = {
+                'char-water': '💧',
+                'char-wood': '🪵',
+                'char-fire': '🔥'
+            };
+            
+            const el = document.createElement('div');
+            el.classList.add('element-particle');
+            el.innerText = icons[type];
+            el.style.left = (Math.random() * 80 + 10) + '%';
+            el.style.top = (Math.random() * 80 + 10) + '%';
+            el.style.setProperty('--dx', (Math.random() * 100 - 50) + 'px');
+            
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+
+        const humanVisual = document.getElementById('visual-human');
+        const chars = document.querySelectorAll('.element-char');
+        let particleInterval;
+
+        chars.forEach(char => {
+            char.addEventListener('mouseenter', () => {
+                const type = char.classList[1]; 
+                particleInterval = setInterval(() => {
+                    createParticle(type, humanVisual);
+                }, 100);
+            });
+            char.addEventListener('mouseleave', () => {
+                clearInterval(particleInterval);
+            });
+        });
+
         // Game 3: 小猫咪
         const cardCat = document.getElementById('visual-cat');
         const lens = document.getElementById('cat-lens');
@@ -528,35 +600,110 @@
             lens.style.clipPath = `circle(0px at 50% 50%)`;
         });
 
-        // Game 4: 稻荷弹射
-        const cardInari = document.getElementById('visual-inari');
-        let isPulling = false;
-        let startY = 0;
+        // Game 4: 稻荷弹射 (简易弹球)
+        const inariVisual = document.getElementById('visual-inari');
+        const inariBall = document.getElementById('inari-ball');
+        let ballState = {
+            x: 0, y: 0,
+            vx: 0, vy: 0,
+            isDragging: false,
+            startX: 0, startY: 0
+        };
+        let animId;
 
-        cardInari.addEventListener('mousedown', (e) => {
-            isPulling = true;
-            startY = e.clientY;
-            cardInari.classList.remove('snapping'); 
-            cardInari.style.transition = 'none'; 
-            cardInari.style.cursor = 'grabbing';
+        function resetBall() {
+            const rect = inariVisual.getBoundingClientRect();
+            ballState.x = rect.width / 2;
+            ballState.y = rect.height - 50;
+            ballState.vx = 0;
+            ballState.vy = 0;
+            updateBallPos();
+        }
+        
+        function updateBallPos() {
+            inariBall.style.left = ballState.x + 'px';
+            inariBall.style.top = ballState.y + 'px';
+        }
+
+        window.addEventListener('load', resetBall);
+        window.addEventListener('resize', resetBall);
+
+        inariBall.addEventListener('mousedown', (e) => {
+            e.stopPropagation(); 
+            ballState.isDragging = true;
+            ballState.startX = e.clientX;
+            ballState.startY = e.clientY;
+            ballState.vx = 0; 
+            ballState.vy = 0;
+            cancelAnimationFrame(animId); 
         });
 
         window.addEventListener('mousemove', (e) => {
-            if (!isPulling) return;
-            const deltaY = e.clientY - startY;
-            const pullDistance = Math.max(0, Math.min(deltaY, 150)); 
-            const scaleY = 1 + pullDistance / 500;
-            const scaleX = 1 - pullDistance / 1000;
-            cardInari.style.transform = `translateY(${pullDistance * 0.5}px) scale(${scaleX}, ${scaleY})`;
+            if (!ballState.isDragging) return;
+            
+            const dx = e.clientX - ballState.startX;
+            const dy = e.clientY - ballState.startY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const maxDrag = 100;
+            let moveX = dx;
+            let moveY = dy;
+            
+            if (dist > maxDrag) {
+                const angle = Math.atan2(dy, dx);
+                moveX = Math.cos(angle) * maxDrag;
+                moveY = Math.sin(angle) * maxDrag;
+            }
+            
+            const rect = inariVisual.getBoundingClientRect();
+            const originX = rect.width / 2;
+            const originY = rect.height - 50;
+
+            ballState.x = originX + moveX;
+            ballState.y = originY + moveY;
+            updateBallPos();
         });
 
-        window.addEventListener('mouseup', () => {
-            if (!isPulling) return;
-            isPulling = false;
-            cardInari.classList.add('snapping'); 
-            cardInari.style.transform = ''; 
-            cardInari.style.cursor = 'pointer';
+        window.addEventListener('mouseup', (e) => {
+            if (!ballState.isDragging) return;
+            ballState.isDragging = false;
+            
+            const rect = inariVisual.getBoundingClientRect();
+            const originX = rect.width / 2;
+            const originY = rect.height - 50;
+            
+            const power = 0.2;
+            ballState.vx = (originX - ballState.x) * power;
+            ballState.vy = (originY - ballState.y) * power;
+            
+            physicsLoop();
         });
+
+        function physicsLoop() {
+            if (ballState.isDragging) return;
+
+            const rect = inariVisual.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+            const r = 15; 
+
+            ballState.x += ballState.vx;
+            ballState.y += ballState.vy;
+            ballState.vx *= 0.98;
+            ballState.vy *= 0.98;
+
+            if (ballState.x < r) { ballState.x = r; ballState.vx *= -0.8; }
+            if (ballState.x > w - r) { ballState.x = w - r; ballState.vx *= -0.8; }
+            if (ballState.y < r) { ballState.y = r; ballState.vy *= -0.8; }
+            if (ballState.y > h - r) { ballState.y = h - r; ballState.vy *= -0.8; }
+
+            updateBallPos();
+
+            if (Math.abs(ballState.vx) < 0.1 && Math.abs(ballState.vy) < 0.1) {
+                return;
+            }
+
+            animId = requestAnimationFrame(physicsLoop);
+        }
 
     </script>
 </body>

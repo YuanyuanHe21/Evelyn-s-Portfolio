@@ -26,16 +26,23 @@
             src: local('Courier New'), monospace;
         }
 
+        :root {
+            /* 核心品牌色 */
+            --color-pink: #f9a7e3;      
+            --color-mint: #0ffdbb;
+            --color-gray: #dbdbd9;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4; /* 浅色背景，与主页统一 */
+            background-color: #f4f4f4; /* 浅色背景 */
             color: #333;
             font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
             overflow-x: hidden;
         }
 
-        /* 导航 (统一风格) */
+        /* 导航 (带发光特效) */
         .nav-back {
             position: fixed;
             top: 40px;
@@ -49,11 +56,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            mix-blend-mode: difference;
-            color: white;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
+            opacity: 0.7;
         }
-        .nav-back:hover { opacity: 0.6; }
+        .nav-back:hover { 
+            opacity: 1;
+            color: var(--color-mint);
+            text-shadow: 0 0 10px rgba(15, 253, 187, 0.8); /* 发光特效 */
+        }
 
         .page-title-fixed {
             position: fixed;
@@ -109,6 +119,7 @@
             max-width: 800px;
         }
 
+        /* 🔴 修改：项目标题去掉背景色，保持原样 */
         .project-title {
             font-family: 'BebasNeue', sans-serif;
             font-size: 48px;
@@ -132,31 +143,37 @@
             color: #555;
         }
         
+        /* 交互提示带背景 */
         .interaction-tip {
             display: inline-block;
-            background: #000;
-            color: #fff;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
             margin-top: 10px;
-            opacity: 0.8;
+            opacity: 1;
+            color: #000;
+        }
+        /* 颜色与标题相反，形成对比 */
+        .project-section:nth-of-type(odd) .interaction-tip {
+            background-color: var(--color-mint);
+        }
+        .project-section:nth-of-type(even) .interaction-tip {
+            background-color: var(--color-pink);
         }
 
         /* =========================================
-           Project 1: 短暂离席 (复古电视 - 唯美版)
+           Project 1: 短暂离席 (复古电视)
            ========================================= */
-        /* 电视放在一个干净的桌面上 */
         .tv-frame {
             position: relative;
             width: 100%;
             max-width: 700px;
             aspect-ratio: 4/3;
-            background: #e0e0e0; /* 浅灰外壳 */
+            background: #e0e0e0; 
             border-radius: 30px;
             padding: 20px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.1); /* 柔和阴影 */
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -169,7 +186,7 @@
             width: 100%;
             height: 100%;
             background: #000;
-            border-radius: 20px; /* 屏幕圆角 */
+            border-radius: 20px;
             position: relative;
             overflow: hidden;
             border: 2px solid #ccc;
@@ -182,17 +199,14 @@
             background-position: center;
             position: relative;
             z-index: 1;
-            /* 唯美图片，默认可见，无需长按才显示，改为长按播放干扰/切换 */
-            /* 或者维持原逻辑：坐下（长按）通电。为了“唯美”，默认可以是黑屏或雪花，长按显示美丽画面 */
         }
 
-        /* 雪花屏层 */
         .tv-static {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABZJREFUeNpi2r9//38gYGAEESAAEGAAasgJOgzOKCoAAAAASUVORK5CYII=');
             background-size: 4px 4px;
-            opacity: 1; /* 默认显示雪花（未通电/未坐下） */
+            opacity: 1; 
             transition: opacity 0.4s ease;
             z-index: 2;
             animation: static-noise 0.2s infinite steps(4);
@@ -200,7 +214,6 @@
             background-color: #222;
         }
 
-        /* 扫描线 - 减弱以保持画面清晰 */
         .scanlines {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -215,14 +228,12 @@
             100% { background-position: 100px 100px; }
         }
 
-        /* 长按交互：模拟坐下，雪花消失，显示画面 */
         .tv-frame:active .tv-static {
             opacity: 0;
         }
 
-
         /* =========================================
-           Project 2: 卡西尼环缝 (探测扫描 - 极简风)
+           Project 2: 卡西尼环缝 (探测扫描)
            ========================================= */
         .scanner-frame {
             position: relative;
@@ -233,19 +244,17 @@
             overflow: hidden;
             border-radius: 12px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            cursor: none; /* 隐藏默认鼠标 */
+            cursor: none; 
         }
 
         .space-bg {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* 默认全彩显示，但稍微暗一点，光圈内更亮 */
             filter: brightness(0.6) grayscale(20%);
             transition: filter 0.5s;
         }
 
-        /* 探测器光圈 - 改为白色极简风 */
         .probe-cursor {
             position: absolute;
             top: 0; left: 0;
@@ -256,7 +265,6 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 10;
-            /* 玻璃拟态 */
             backdrop-filter: brightness(1.8) grayscale(0%) blur(0px);
             box-shadow: 0 0 30px rgba(255,255,255,0.2);
             display: flex;
@@ -282,9 +290,8 @@
         }
 
         /* =========================================
-           Project 3: DT 海报 (放大镜/聚光灯 - 浅色版)
+           Project 3: DT 海报 (起雾擦除/刮刮卡)
            ========================================= */
-        /* 模拟挂在墙上的画框 */
         .poster-frame {
             position: relative;
             width: 100%;
@@ -293,41 +300,30 @@
             background-color: #fff;
             box-shadow: 0 30px 60px rgba(0,0,0,0.1);
             overflow: hidden;
-            cursor: crosshair;
+            /* 鼠标样式：擦除 */
+            cursor: crosshair; 
             margin: 0 auto;
         }
         
+        /* 底部清晰图 */
         .blueprint-img {
+            position: absolute;
+            top: 0; left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* 默认模糊一点，像是在远处 */
-            filter: blur(2px) grayscale(30%);
-            transition: filter 0.3s;
+            z-index: 1;
         }
 
-        /* 放大镜/清晰视窗 */
-        .clear-view {
+        /* 顶部 Canvas (雾气层) */
+        #fog-canvas {
             position: absolute;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            /* 原始清晰图作为背景 */
-            background-image: url('../assets/images/install-poster.png'); /* 需JS同步 */
-            background-size: cover; /* 需与img一致 */
-            /* 遮罩实现局部清晰 */
-            mask-image: radial-gradient(circle 120px at var(--x) var(--y), black 100%, transparent 100%);
-            -webkit-mask-image: radial-gradient(circle 120px at var(--x) var(--y), black 100%, transparent 100%);
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        /* 边框装饰 */
-        .frame-border {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border: 10px solid #fff;
-            pointer-events: none;
-            z-index: 10;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            /* 确保触摸事件不被阻挡 */
+            touch-action: none;
         }
 
     </style>
@@ -359,11 +355,8 @@
             <!-- 电视机容器 -->
             <div class="tv-frame" id="tv-box">
                 <div class="tv-screen-container">
-                    <!-- 你的唯美作品图 -->
                     <div class="tv-screen" style="background-image: url('../assets/images/install-tv.png');"></div>
-                    <!-- 雪花遮罩 -->
                     <div class="tv-static"></div>
-                    <!-- 扫描线 -->
                     <div class="scanlines"></div>
                 </div>
             </div>
@@ -382,9 +375,7 @@
             </div>
 
             <div class="scanner-frame" id="scanner-box">
-                <!-- 背景图 -->
                 <img src="../assets/images/install-cassini.png" class="space-bg" alt="Cassini Corridor" onerror="this.src='https://placehold.co/1000x600/222/555?text=Space+Aesthetics'">
-                <!-- 探测光圈 -->
                 <div class="probe-cursor" id="probe">
                     <div class="probe-center"></div>
                     <div class="probe-data">Scanning...</div>
@@ -393,7 +384,7 @@
         </section>
 
 
-        <!-- Project 3: DT 海报 -->
+        <!-- Project 3: DT 海报 (起雾交互) -->
         <section class="project-section">
             <div class="project-header">
                 <h2 class="project-title">Design Thinking</h2>
@@ -401,16 +392,14 @@
                 <div class="project-desc">
                     设计思维课程成果展示。
                 </div>
-                <span class="interaction-tip">移动以查看细节</span>
+                <span class="interaction-tip">擦除雾气查看细节</span>
             </div>
 
             <div class="poster-frame" id="poster-box">
-                <!-- 底图 (模糊) -->
-                <img src="../assets/images/install-poster.png" class="blueprint-img" alt="DT Poster" onerror="this.src='https://placehold.co/800x1200/eee/ccc?text=Aesthetic+Poster'">
-                <!-- 清晰层 (通过mask显示) -->
-                <div class="clear-view" style="background-image: url('../assets/images/install-poster.png');"></div>
-                <!-- 边框 -->
-                <div class="frame-border"></div>
+                <!-- 清晰底图 -->
+                <img src="../assets/images/install-poster.png" class="blueprint-img" alt="DT Poster" onerror="this.src='https://placehold.co/800x1200/003366/FFF?text=Clear+Poster'">
+                <!-- 雾气画布 -->
+                <canvas id="fog-canvas"></canvas>
             </div>
         </section>
 
@@ -418,9 +407,8 @@
 
     <script>
         /* =========================================
-           Project 1: TV 交互逻辑
+           Project 1: TV 交互逻辑 (CSS Active)
            ========================================= */
-        // CSS :active 已经处理了按下的视觉反馈
         
         /* =========================================
            Project 2: 卡西尼扫描逻辑
@@ -446,29 +434,68 @@
                 probeData.innerText = `Analyzing: ${el} ${pct}`;
             }
         });
-        
-        // 离开时隐藏光圈
-        scannerBox.addEventListener('mouseleave', () => {
-             // 可以选择隐藏或重置位置
-        });
 
         /* =========================================
-           Project 3: 海报放大镜逻辑
+           Project 3: 起雾/刮刮卡逻辑
            ========================================= */
+        const canvas = document.getElementById('fog-canvas');
+        const ctx = canvas.getContext('2d');
         const posterBox = document.getElementById('poster-box');
-        const clearView = posterBox.querySelector('.clear-view');
-        // 同步背景图 (如果JS动态加载图片)
-        // clearView.style.backgroundImage = `url(${posterBox.querySelector('img').src})`;
 
-        posterBox.addEventListener('mousemove', (e) => {
+        // 设置画布大小
+        function resizeCanvas() {
             const rect = posterBox.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // 更新 Mask 位置
-            posterBox.style.setProperty('--x', `${x}px`);
-            posterBox.style.setProperty('--y', `${y}px`);
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            initFog();
+        }
+
+        // 初始化雾气 (填充半透明白色)
+        function initFog() {
+            // 🔴 修改：使用干净的乳白色
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // 擦除函数
+        function scratch(x, y) {
+            ctx.globalCompositeOperation = 'destination-out'; // 核心：变透明
+            ctx.beginPath();
+            ctx.arc(x, y, 50, 0, Math.PI * 2); // 擦除半径 50
+            ctx.fill();
+        }
+
+        // 事件监听
+        let isDrawing = false;
+
+        // 鼠标
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            scratch(e.clientX - rect.left, e.clientY - rect.top);
         });
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                const rect = canvas.getBoundingClientRect();
+                scratch(e.clientX - rect.left, e.clientY - rect.top);
+            }
+            // 移动即擦除，模拟哈气效果，更流畅
+            const rect = canvas.getBoundingClientRect();
+            scratch(e.clientX - rect.left, e.clientY - rect.top);
+        });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+
+        // 触摸
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // 防止滚动
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+        });
+
+        // 初始化
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
 
     </script>
 </body>
