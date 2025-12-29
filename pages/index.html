@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evelyn's Portfolio - 设计师的精神状态</title>
+    
+    <style>
+        /* =========================================
+           1. 字体定义
+           ========================================= */
+        @font-face {
+            font-family: 'InstrumentSans-Regular';
+            src: url('assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'PuHuiTi';
+            src: url('assets/fonts/Alibaba-PuHuiTi-Light.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'BebasNeue';
+            src: url('assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'ChalkFont';
+            src: local('Chalkboard SE'), local('Comic Sans MS'), sans-serif;
+        }
+
+        /* =========================================
+           2. 全局基础样式
+           ========================================= */
+        :root {
+            /* 颜色 */
+            --color-pink: #f9a7e3;      
+            --color-mint: #0ffdbb;      
+            --color-gray: #dbdbd9;
+            /* 字体大小 */
+            --font-size-large: 52px;    
+            --font-size-Regular: 28px;   
+            --font-size-small: 24px;    
+            --font-size-tiny: 16px; 
+            
+            /* 时钟参数 */
+            --clock-radius: 270px;
+            --avatar-size: 220px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff; /* 纯白背景 */
+            font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
+            overflow: hidden; /* 全屏无滚动 */
+            height: 100vh;
+            width: 100vw;
+            position: relative; /* 作为绝对定位元素的基准 */
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1); /* 添加页面整体移动动画 */
+        }
+
+        /* 页面上滑消失的类 (用于去废稿公墓) */
+        body.slide-up-out {
+            transform: translateY(-100vh);
+        }
+
+        /* 背景图 */
+        #bg-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            top: 0; left: 0;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* =========================================
+           3. LOADING 遮罩层样式
+           ========================================= */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff;
+            z-index: 9999; /* 最高层级，盖住一切 */
+            display: flex; /* 默认显示，JS控制隐藏 */
+            justify-content: center;
+            align-items: center;
+            cursor: progress;
+        }
+
+        .loading-header { position: absolute; top: 40px; left: 40px; font-size: 12px; line-height: 1.5; color: #333; text-align: left;}
+        .status-text { font-weight: bold; font-size: 16px; margin-top: 10px; display: block; }
+        .kanji-status { position: absolute; top: 30px; right: 40px; font-family: 'PuHuiTi', sans-serif; font-size: 80px; font-weight: bold; color: #000; transition: transform 0.2s; }
+        .center-stage { position: relative; display: flex; align-items: center; justify-content: center; gap: 40px; width: 100%; }
+        .hero-text { font-family: 'BebasNeue', sans-serif; font-size: 60px; color: #000; letter-spacing: 2px; }
+        .cat-container { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
+        .cat-img { width: 100%; height: auto; object-fit: contain; transition: opacity 0.1s; }
+        #cat-crazy { position: absolute; top: 0; left: 0; opacity: 0; display: none; }
+        .loading-percent { position: absolute; bottom: -60px; font-family: 'BebasNeue', sans-serif; font-size: 24px; color: #000; }
+        .loading-footer { position: absolute; bottom: 40px; left: 40px; font-size: 12px; color: #666; }
+        .loading-spinner { position: absolute; bottom: 40px; right: 40px; width: 30px; height: 30px; border: 4px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* 疯癫特效 */
+        .body-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) infinite both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        
+        /* 进入按钮 */
+        .enter-btn-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; cursor: pointer; display: none; justify-content: center; align-items: center; }
+        .click-hint { position: absolute; bottom: 20%; background: #000; color: #fff; padding: 10px 20px; font-size: 18px; font-weight: bold; transform: rotate(-5deg); animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(-5deg) scale(1.1); } }
+
+        /* 遮罩炸开动画 */
+        .overlay-explode {
+            animation: explode-fade 0.8s forwards;
+            pointer-events: none;
+        }
+        @keyframes explode-fade {
+            0% { transform: scale(1); opacity: 1; filter: blur(0); }
+            50% { transform: scale(1.5); opacity: 0; filter: blur(10px); }
+            100% { transform: scale(2); opacity: 0; display: none; }
+        }
+
+        /* =========================================
+           4. 主页其余样式 (保持不变)
+           ========================================= */
+        .header-marquee { position: absolute; top: 10px; left: 0; width: 100%; height: 120px; overflow: hidden; z-index: 10; display: flex; align-items: center; }
+        .marquee-inner { display: flex; width: fit-content; animation: scroll-left 12s linear infinite; }
+        .marquee-inner img { height: 90px; margin-right: 300px; display: block; }
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        .left-panel { position: absolute; top: 20vh; left: 5vw; width: 480px; text-align: right; z-index: 20; color: #000; }
+        @media (max-height: 800px) { .left-panel { top: 15vh; } }
+        .portfolio-title { font-family: 'BebasNeue', sans-serif; font-size: 52px; line-height: 1; margin-bottom: 15px; letter-spacing: 2px; }
+        .social-icons { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 50px; }
+        .social-btn { width: 40px; height: 40px; cursor: pointer; transition: transform 0.2s; }
+        .social-btn:hover { transform: scale(1.1); }
+        .intro-text-cn { font-size: 15px; line-height: 1.6; margin-bottom: 30px; font-weight: 500; }
+        .intro-text-en { font-family: 'InstrumentSans-Regular', sans-serif; font-size: 12px; line-height: 1.5; color: #555; margin-bottom: 60px; }
+        .tagline { font-size: 16px; font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+
+        .footer-float { position: absolute; bottom: 0; z-index: 15; opacity: 0; animation: float-up 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .float-left { left: 15px; bottom: 15px; width: 150px; animation-delay: 0.2s; }
+        .float-center { left: 50%; transform: translateX(-50%); bottom: 10px; width: 25px; animation-name: float-up-center; animation-delay: 0.4s; }
+        .float-right { right: 45px; bottom: 15px; width: 150px; text-align: right; animation-delay: 0.6s; }
+        .footer-float img { width: 120%; height: auto; display: block; }
+        @keyframes float-up { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes float-up-center { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
+        #clock-wrapper { position: absolute; left: 70%; top: 50%; width: 0; height: 0; display: flex; justify-content: center; align-items: center; z-index: 50; transform: scale(0.75); }
+        #clock-center { position: absolute; width: 0; height: 0; }
+        #center-avatar { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); z-index: 300; background: none; border: none; cursor: pointer; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #center-avatar img { width: var(--avatar-size); display: block; }
+        .avatar-hover { transform: translate(-50%, -50%) scale(1.1) !important; }
+        .hand { position: absolute; left: 0; top: 0; transform-origin: 50% 100%; transform: translate(-50%, -100%); pointer-events: none; z-index: 200; }
+        #hour-hand[src], #minute-hand[src], #second-hand[src] { background: none; width: auto; }
+        #hour-hand { height: 150px; width: 12px; background: black; }
+        #minute-hand { height: 210px; width: 8px; background: #333; }
+        #second-hand { height: 240px; width: 4px; background: red; }
+
+        .clock-item { position: absolute; left: -60px; top: -30px; transform-origin: center; text-align: center; cursor: pointer; z-index: 30; white-space: nowrap; }
+        .click-layer { transition: transform .2s ease, filter .2s ease; display: inline-block; }
+        .clock-item.hover-active .click-layer { transform: scale(1.1); filter: brightness(1.05); }
+        .clock-item.pressed .click-layer { transform: scale(0.95) !important; }
+        .label { font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif; font-size: var(--font-size-large); color: #000; line-height: 1; }
+        .sub { font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif; font-size: var(--font-size-small); opacity: 0.8; color: #000; display: block; }
+        .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }
+        .bg-pink { background-color: var(--color-pink); padding: 2px 8px; }
+        .bg-mint { background-color: var(--color-mint); padding: 2px 8px; }
+        .bg-gray { background-color: var(--color-gray); padding: 2px 8px; }
+        .white-text { color: #fff !important; }
+
+        .item-12 { transform: rotate(0deg) translate(0, calc(-1 * var(--clock-radius))) rotate(0deg); }
+        .overtime-wrapper { display: flex; align-items: flex-end; gap: 10px; justify-content: center; }
+        .sub-icons img { width: 30px; height: 30px; }
+        .item-2 { transform: rotate(40deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-40deg); }
+        .item-3 { transform: rotate(61deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-61deg); }
+        .software-block { display: flex; flex-direction: column; align-items: center; }
+        .item-3 .software-block { align-items: flex-start; } 
+        .software-block img.icon { width: 100px; margin-bottom: 5px; }
+        .software-label { font-size: var(--font-size-Regular); }
+        .item-4 { transform: rotate(102deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-102deg); }
+        .item-4 .sub { margin-top: 5px; }
+        .item-5 { transform: rotate(125deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-125deg); }
+        .item-5 .click-layer { display: flex; flex-direction: row; align-items: center; gap: 5px; }
+        .item-5 .arduino-label { font-size: var(--font-size-Regular); padding: 6px 4px; }
+        .item-6 { transform: rotate(180deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-180deg); }
+        .small-emoji { width: 40px; }
+        .item-7 { transform: rotate(195deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-195deg); }
+        .item-7 .label { padding: 8px 4px; } .item-7 .click-layer { margin-top: -35px; }
+        .item-8 { transform: rotate(230deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-230deg); }
+        .item-9 { transform: rotate(258deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-258deg); }
+        .item-9 .sub { text-align: right; margin-bottom: 5px; display: block; }
+        .item-9 .label { display: inline-block; }
+        .item-10 { transform: rotate(295deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-295deg); }
+        .item-11 { transform: rotate(337deg) translate(0, calc(-1 * var(--clock-radius))) rotate(-337deg); }
+        .item-11 .click-layer { display: flex; flex-direction: row; align-items: flex-start; gap: 8px; margin-top: -30px; }
+        .item-11 .main-text { font-size: var(--font-size-large); line-height: 1.1; padding: 8px 6px; }
+        .item-11 .sub-text { font-size: var(--font-size-tiny); opacity: 0.6; margin-top: 6px; }
+
+        /* 弹幕气泡样式 (修改版：去硬边，延长动画) */
+        .toxic-bubble {
+            position: absolute;
+            right: 120%; bottom: 50%;
+            background: #fff; 
+            border: 3px solid #000; 
+            /* 🔴 修改：使用柔和阴影替代硬边阴影 */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+            padding: 8px 14px; 
+            border-radius: 8px;
+            font-size: 16px; 
+            font-weight: 900; 
+            color: #000;
+            white-space: normal;
+            word-break: break-word;
+            width: max-content; 
+            max-width: 260px;
+            z-index: 1000; 
+            transform-origin: center center;
+            /* 🔴 修改：动画时长增加到 4s */
+            animation: comic-barrage 4s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes comic-barrage {
+            0% { opacity: 0; transform: translate(0, 20px) scale(0.5); }
+            10% { opacity: 1; transform: translate(0, 0) scale(1.1); }
+            20% { transform: translate(0, 0) scale(1); }
+            /* 🔴 修改：飘得更高，给足阅读时间 */
+            80% { opacity: 1; transform: translate(0, -150px) scale(1); }
+            100% { opacity: 0; transform: translate(0, -250px) scale(0.9); }
+        }
+
+        /* =========================================
+           5. 神经质白板 (Class Overlay)
+           ========================================= */
+        #class-overlay {
+            position: fixed;
+            top: -100%; /* 初始在上面 */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f4f4f4; 
+            z-index: 5000;
+            transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: none; /* 隐藏鼠标，用笔代替 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        #class-overlay.active {
+            top: 0;
+        }
+
+        /* 笔光标 */
+        .chalk-cursor {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: #000;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5001;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        /* 疯癫文字弹幕 (彩色版) */
+        .crazy-text {
+            position: absolute;
+            font-family: 'InstrumentSans-Regular', sans-serif; /* 现代字体 */
+            font-weight: 900; /* 加粗 */
+            pointer-events: none;
+            white-space: nowrap;
+            color: #000; 
+            animation: jitter 0.2s infinite;
+        }
+
+        @keyframes jitter {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(2px, 2px) rotate(1deg); }
+            50% { transform: translate(-2px, -1px) rotate(-1deg); }
+            75% { transform: translate(1px, -2px) rotate(0.5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* 画布 */
+        #scribble-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 退出提示 */
+        .escape-hint {
+            position: absolute;
+            bottom: 30px;
+            font-family: 'BebasNeue', sans-serif;
+            font-size: 32px;
+            color: rgba(0,0,0,0.2); 
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay">
+    <div class="loading-header">
+        Entertainment Design @ Creative Direction by Evelyn-2025<br>
+        Small compilation of unposted works, some course work... some personal work.<br>
+        COPYRIGHT @ Evelyn 2025
+        <span class="status-text" id="status-text">I AM FINE.</span>
+    </div>
+    <div class="kanji-status" id="kanji">静</div>
+    <div class="center-stage">
+        <div class="hero-text">EVELYN 'S</div>
+        <div class="cat-container">
+            <img src="assets/images/cat-calm.png" id="cat-calm" class="cat-img" alt="Calm Cat" onerror="this.src='https://placehold.co/300x300/transparent/000?text=🐱';">
+            <img src="assets/images/cat-crazy.png" id="cat-crazy" class="cat-img" alt="Crazy Cat" onerror="this.src='https://placehold.co/300x300/transparent/000?text=🙀';">
+            <div class="loading-percent" id="percent">0%</div>
+        </div>
+        <div class="hero-text">PORTFOLIO</div>
+    </div>
+    <div class="loading-footer">Copyright @ 2025 Evelyn. All rights reserved.</div>
+    <div class="loading-spinner" id="spinner"></div>
+    <div class="enter-btn-overlay" id="enter-btn">
+        <div class="click-hint">CLICK TO GET CRAZY!</div>
+    </div>
+</div>
+
+<!-- CLASSROOM OVERLAY (神经质白板) -->
+<div id="class-overlay">
+    <canvas id="scribble-canvas"></canvas>
+    <div class="chalk-cursor" id="chalk-cursor"></div>
+    <div class="escape-hint">CLICK TO ESCAPE CLASS</div>
+</div>
+
+<!-- 主页内容 -->
+<img src="assets/images/clock-bg.png" id="bg-image" alt="bg" onerror="this.style.display='none'">
+
+<div class="header-marquee">
+    <div class="marquee-inner">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
+        <img src="assets/images/header-scroll.png" alt="THE MENTAL STATE OF GRAPHIC DESIGN">
+    </div>
+</div>
+
+<aside class="left-panel">
+    <h1 class="portfolio-title">EVELYN ’S PORTFOLIO</h1>
+    <div class="social-icons">
+        <a href="pages/about.html"><img src="assets/images/social-ins.png" class="social-btn" alt="IG" onerror="this.style.background='#000';this.style.borderRadius='50%'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-link.png" class="social-btn" alt="In" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
+        <a href="pages/about.html"><img src="assets/images/social-web.png" class="social-btn" alt="Web" onerror="this.style.background='#000';this.style.borderRadius='5px'"></a>
+    </div>
+    <p class="intro-text-cn">
+        这里是Evelyn He的个人设计网站，<br>
+        包含了交互装置、游戏及其他媒介的设计作品，<br>
+        以及无厘头想放进来的东西。
+    </p>
+    <p class="intro-text-en">
+        Welcome to Evelyn He's personal design website,<br>
+        featuring interactive installations, games, and design works in other media,<br>
+        as well as random things i want to include.
+    </p>
+    <div class="tagline">我开朗的原因：我疯了</div>
+</aside>
+
+<div class="footer-float float-left"><img src="assets/images/footer-left.png" alt="Left Footer"></div>
+<div class="footer-float float-center"><img src="assets/images/footer-center.png" alt="Arrow"></div>
+<div class="footer-float float-right"><img src="assets/images/footer-right.png" alt="Right Footer"></div>
+
+<div id="clock-wrapper">
+    <div id="clock-center"></div>
+    <img src="assets/images/hour-hand.png" id="hour-hand" class="hand" alt="hour">
+    <img src="assets/images/minute-hand.png" id="minute-hand" class="hand" alt="minute">
+    <img src="assets/images/second-hand.png" id="second-hand" class="hand" alt="second">
+    <button id="center-avatar" data-target="pages/about.html">
+        <img src="assets/images/center-avatar.png" alt="About Me" onerror="this.src='https://placehold.co/220x220/png?text=COW';">
+    </button>
+
+    <div class="clock-item item-12" data-angle="0" data-target="pages/assistant.html">
+        <div class="click-layer"><div class="overtime-wrapper"><span class="label bg-pink">加班</span><div class="sub-icons"><img src="assets/images/icons/canvas.svg"><img src="assets/images/icons/ai.svg"></div></div></div>
+    </div>
+    <div class="clock-item item-2" data-angle="45" data-target="comics.html"><div class="click-layer"><span class="label bg-gray">改稿</span></div></div>
+    <div class="clock-item item-3" data-angle="70" data-target="pages/games.html"><div class="click-layer"><div class="software-block"><img src="assets/images/icons/unity.svg" class="icon"><span class="software-label bg-pink">Unity</span></div></div></div>
+    
+    <!-- 4点: 上课 -->
+    <div class="clock-item item-4" data-angle="105" data-target="CLASS_INTERACTION">
+        <div class="click-layer"><span class="label bg-mint">上课</span><span class="sub">ATTEND CLASS</span></div>
+    </div>
+
+    <div class="clock-item item-5" data-angle="135" data-target="pages/installations.html"><div class="click-layer"><span class="vertical-text arduino-label bg-mint">Arduino IDE</span><div class="software-block"><img src="assets/images/icons/arduino.svg" class="icon"></div></div></div>
+    <div class="clock-item item-6" data-angle="180" data-target="pages/burnout.html"><div class="click-layer"><span class="label bg-gray">燃尽了…</span><img src="assets/images/emoji/burnout.png" class="small-emoji"></div></div>
+    <div class="clock-item item-7" data-angle="200" data-target="none"><div class="click-layer"><span class="label vertical-text bg-pink">熬夜</span></div></div>
+    <div class="clock-item item-8" data-angle="235" data-target="pages/ui.html"><div class="click-layer"><div class="software-block"><img src="assets/images/icons/figma.svg" class="icon"><span class="software-label bg-mint">Figma</span></div></div></div>
+    <div class="clock-item item-9" data-angle="265" id="pitch-button" data-target="pages/proposal.html"><div class="click-layer"><span class="sub bg-mint">开机</span><span class="label bg-gray">提案</span></div></div>
+    <div class="clock-item item-10" data-angle="300" data-target="visual.html"><div class="click-layer"><div class="software-block"><img src="assets/images/icons/ps.svg" class="icon"><span class="software-label bg-pink white-text">Photoshop</span></div></div></div>
+    <div class="clock-item item-11" data-angle="337" data-target="pages/photography.html"><div class="click-layer"><span class="vertical-text main-text bg-gray">暂停营业</span><span class="vertical-text sub-text">*暂时无法工作</span></div></div>
+</div>
+
+<!-- 音效 -->
+<audio id="tick-sound" src="assets/audio/tick.mp3" preload="auto"></audio>
+<audio id="sfx-click" src="assets/audio/click.mp3" preload="auto"></audio>
+<audio id="sfx-moo" src="assets/audio/moo.mp3" preload="auto"></audio>
+<audio id="sfx-glitch" src="assets/audio/glitch.mp3" preload="auto"></audio>
+<audio id="sfx-explode" src="assets/audio/explode.mp3" preload="auto"></audio>
+<audio id="sfx-chalk" src="assets/audio/chalk.mp3" preload="auto"></audio>
+<audio id="sfx-bell" src="assets/audio/bell.mp3" preload="auto"></audio>
+
+<!-- JS 逻辑 -->
+<script>
+    /* -------------------------------------
+       0. 白板交互逻辑 (Class Overlay)
+       ------------------------------------- */
+    const classOverlay = document.getElementById('class-overlay');
+    const chalkCursor = document.getElementById('chalk-cursor');
+    const sfxChalk = document.getElementById('sfx-chalk');
+    const sfxBell = document.getElementById('sfx-bell');
+    const canvas = document.getElementById('scribble-canvas');
+    const ctx = canvas.getContext('2d');
+    let isClassActive = false;
+
+    // 初始化画布
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // 激活白板
+    function startClass() {
+        isClassActive = true;
+        classOverlay.classList.add('active');
+        chalkCursor.style.display = 'block';
+        
+        // 播放音效
+        if(sfxChalk) {
+            sfxChalk.currentTime = 0;
+            sfxChalk.loop = true;
+            sfxChalk.play().catch(()=>{});
+        }
+
+        // 自动生成弹幕
+        generateCrazyText();
+    }
+
+    // 退出白板
+    function endClass() {
+        if(!isClassActive) return;
+        isClassActive = false;
+        
+        // 停止粉笔音效
+        if(sfxChalk) {
+            sfxChalk.pause();
+            sfxChalk.loop = false;
+        }
+        // 播放下课铃
+        if(sfxBell) sfxBell.play().catch(()=>{});
+
+        // 收起白板
+        classOverlay.classList.remove('active');
+        chalkCursor.style.display = 'none';
+        
+        // 清理画布
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.querySelectorAll('.crazy-text').forEach(el => el.remove());
+        }, 500);
+    }
+
+    // 鼠标绘画 (黑色笔触)
+    classOverlay.addEventListener('mousemove', (e) => {
+        chalkCursor.style.left = e.clientX - 7 + 'px';
+        chalkCursor.style.top = e.clientY - 7 + 'px';
+
+        if(isClassActive && Math.random() > 0.5) {
+            ctx.beginPath();
+            ctx.arc(e.clientX, e.clientY, 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.8)'; // 黑色涂鸦
+            ctx.fill();
+        }
+    });
+
+    classOverlay.addEventListener('click', endClass);
+
+    // 自动弹幕生成器 (彩色)
+    function generateCrazyText() {
+        if(!isClassActive) return;
+        
+        const texts = ["听不懂", "???", "GPA", "想睡觉", "别念了", "Deadline", "Zzz...", "Help", "🤯", "🆘"];
+        const colors = ['#000', '#f9a7e3', '#0ffdbb']; // 黑/粉/绿
+        
+        const el = document.createElement('div');
+        el.classList.add('crazy-text');
+        el.innerText = texts[Math.floor(Math.random() * texts.length)];
+        el.style.color = colors[Math.floor(Math.random() * colors.length)];
+        
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.fontSize = (20 + Math.random() * 60) + 'px';
+        el.style.transform = `rotate(${Math.random()*60-30}deg)`;
+        
+        classOverlay.appendChild(el);
+        
+        // 继续生成
+        setTimeout(generateCrazyText, 150);
+    }
+
+
+    /* -------------------------------------
+       1. LOADING 逻辑
+       ------------------------------------- */
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (sessionStorage.getItem('portfolio_visited')) {
+        loadingOverlay.style.display = 'none';
+    } else {
+        startLoadingProcess();
+    }
+
+    function startLoadingProcess() {
+        const percentEl = document.getElementById('percent');
+        const kanjiEl = document.getElementById('kanji');
+        const statusTextEl = document.getElementById('status-text');
+        const catCalm = document.getElementById('cat-calm');
+        const catCrazy = document.getElementById('cat-crazy');
+        const spinner = document.getElementById('spinner');
+        const enterBtn = document.getElementById('enter-btn');
+        const sfxGlitch = document.getElementById('sfx-glitch');
+        
+        let progress = 0;
+        let interval = setInterval(() => {
+            progress += 2; 
+            if(Math.random() > 0.8) progress -= 0.5;
+
+            let displayProgress = Math.floor(progress);
+            if (displayProgress > 100) displayProgress = 100;
+            percentEl.innerText = displayProgress + '%';
+
+            if (displayProgress > 80) {
+                if (Math.random() > 0.7) {
+                    catCalm.style.opacity = 0;
+                    catCrazy.style.display = 'block';
+                    catCrazy.style.opacity = 1;
+                    kanjiEl.innerText = "疯";
+                    loadingOverlay.classList.add('body-shake');
+                    if (sfxGlitch) sfxGlitch.play().catch(()=>{});
+                } else {
+                    catCalm.style.opacity = 1;
+                    catCrazy.style.display = 'none';
+                    catCrazy.style.opacity = 0;
+                    kanjiEl.innerText = "静";
+                    loadingOverlay.classList.remove('body-shake');
+                }
+            }
+
+            if (progress >= 100) {
+                clearInterval(interval);
+                percentEl.innerText = '';
+                catCalm.style.display = 'none';
+                catCrazy.style.display = 'block';
+                catCrazy.style.opacity = 1;
+                kanjiEl.innerText = "疯";
+                statusTextEl.innerText = "I AM CRAZY.";
+                loadingOverlay.classList.add('body-shake');
+                loadingOverlay.style.backgroundColor = '#f4f4f4';
+                spinner.style.display = 'none';
+                enterBtn.style.display = 'flex';
+                
+                enterBtn.addEventListener('click', () => {
+                    const sfxExplode = document.getElementById('sfx-explode');
+                    if (sfxExplode) sfxExplode.play().catch(()=>{});
+                    sessionStorage.setItem('portfolio_visited', 'true');
+                    loadingOverlay.classList.add('overlay-explode');
+                    setTimeout(() => { loadingOverlay.style.display = 'none'; }, 800);
+                });
+            }
+        }, 30);
+    }
+
+    /* -------------------------------------
+       2. 主页常规逻辑
+       ------------------------------------- */
+    const toxicLines = [
+        "你听不懂人话吗？", "你在干什么？", "那不就相当于什么都没做吗？",
+        "好丑", "好土啊，你的方案活在二十年前", "准备熬夜吧", "ESP32太好用了", 
+        "从今天开始Arduino是路边的狗", "只需Gemini3略微出手", "发出了像牛又像马的嘶鸣",
+        "字间距再调一下...算了改回去吧", "那我的钱怎么像袅一样溜走了", 
+        "做游戏能让一个人的外貌焕然一新", "预算只有五百", "周四前能给吗？",
+        "我只是一只鸟啊为什么这么多ddl要赶", "讲座海报的人像一定要大！", 
+        "辛苦你再扒拉扒拉…（省略一万字）其他就没有了", 
+        "有很多长得很诡谲的设计其实是甲方的灵机一动", "上吊了还以为人在荡秋千[超喜欢R]", 
+        "换个颜色，要那种显眼的", "不要用这个字体，不专业", "感觉差点意思", 
+        "照着这个抄，但要不一样", "帮我P掉那个路人，顺便换个天", "用PPT做个海报", 
+        "这一版不如第一版", "再微调一下", "能不能免费帮我画个Logo", 
+        "你这也没做多少东西啊", "把这个二维码放中间", "要不你先做几个方案我挑挑", 
+        "我觉得你没理解我的意思", "这个红不是我想要的红", "你再想想", 
+        "随便做做就行，很快的", "我不懂设计，但我觉得不好看", "能再快点吗？", "这是最后一次修改"
+    ];
+
+    function randomToxic() {
+        return toxicLines[Math.floor(Math.random() * toxicLines.length)];
+    }
+
+    function showToxicBubble(text) {
+        const container = document.querySelector('.item-9');
+        if (!container) return;
+        const bubble = document.createElement('div');
+        bubble.classList.add('toxic-bubble');
+        bubble.innerText = text;
+        const offsetX = Math.floor(Math.random() * 40) - 20;
+        const offsetY = Math.floor(Math.random() * 20) - 10;
+        bubble.style.right = `calc(120% + ${offsetX}px)`;
+        bubble.style.bottom = `calc(50% + ${offsetY}px)`;
+        container.appendChild(bubble);
+        // 🔴 修改：弹幕显示 4.1 秒后消失 (匹配动画 4s)
+        setTimeout(() => { bubble.remove(); }, 4100);
+    }
+
+    const CLOCK_SPEED = 30; 
+    const hourHand = document.getElementById("hour-hand");
+    const minuteHand = document.getElementById("minute-hand");
+    const secondHand = document.getElementById("second-hand");
+    const tickSound = document.getElementById("tick-sound");
+    let isHovering = false;
+
+    function updateClock() {
+        if (!isHovering) {
+            const now = Date.now();
+            const fastSeconds = (now / 1000) * CLOCK_SPEED;
+            const secondDeg = (fastSeconds % 60) * 6;
+            const minuteDeg = ((fastSeconds / 60) % 60) * 6;
+            const hourDeg   = ((fastSeconds / 3600) % 12) * 30;
+
+            hourHand.style.transform = `translate(-50%, -100%) rotate(${hourDeg}deg)`;
+            minuteHand.style.transform = `translate(-50%, -100%) rotate(${minuteDeg}deg)`;
+            secondHand.style.transform = `translate(-50%, -100%) rotate(${secondDeg}deg)`;
+        }
+        requestAnimationFrame(updateClock);
+    }
+    requestAnimationFrame(updateClock);
+
+    function pointToAngle(targetDeg) {
+        isHovering = true;
+        if (tickSound) {
+            tickSound.currentTime = 0;
+            tickSound.play().catch(e => console.log("Audio blocked"));
+        }
+        hourHand.style.transition = "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
+        hourHand.style.transform = `translate(-50%, -100%) rotate(${targetDeg}deg)`;
+        minuteHand.style.transition = "transform 0.5s ease";
+        secondHand.style.transition = "transform 0.5s ease";
+    }
+
+    function resumeClock() {
+        isHovering = false;
+        hourHand.style.transition = "none";
+        minuteHand.style.transition = "none";
+        secondHand.style.transition = "none";
+    }
+
+    /* --------------------------------------
+       滚轮下滚去公墓
+       -------------------------------------- */
+    let isNavigatingToHidden = false;
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            isNavigatingToHidden = false;
+            document.body.classList.remove('slide-up-out');
+            const sfxMoo = document.getElementById("sfx-moo");
+            if (sfxMoo) { sfxMoo.pause(); sfxMoo.currentTime = 0; }
+        }
+    });
+
+    window.addEventListener('wheel', (e) => {
+        if (isNavigatingToHidden) return;
+        if (e.deltaY > 50) {
+            isNavigatingToHidden = true;
+            const sfxMoo = document.getElementById("sfx-moo");
+            let delay = 2500;
+            if (sfxMoo) {
+                sfxMoo.currentTime = 0;
+                sfxMoo.play().catch(()=>{});
+                if (sfxMoo.duration && !isNaN(sfxMoo.duration)) delay = sfxMoo.duration * 1000;
+            }
+            document.body.classList.add('slide-up-out');
+            setTimeout(() => { window.location.href = "pages/hidden.html"; }, delay); 
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const items = document.querySelectorAll(".clock-item");
+        const clickSfx = document.getElementById("sfx-click");
+        const avatar = document.getElementById("center-avatar");
+        const sfxMoo = document.getElementById("sfx-moo");
+
+        if(avatar) {
+            avatar.addEventListener("mouseenter", () => avatar.classList.add("avatar-hover"));
+            avatar.addEventListener("mouseleave", () => avatar.classList.remove("avatar-hover"));
+            avatar.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (sfxMoo) {
+                    sfxMoo.currentTime = 0;
+                    sfxMoo.play().catch(e => console.log("Audio play blocked"));
+                }
+                setTimeout(() => { window.location.href = "pages/about.html"; }, 800);
+            });
+        }
+
+        items.forEach(item => {
+            const angle = Number(item.dataset.angle);
+            item.addEventListener("mouseenter", () => { item.classList.add("hover-active"); pointToAngle(angle); });
+            item.addEventListener("mouseleave", () => { item.classList.remove("hover-active"); resumeClock(); });
+            item.addEventListener("mousedown", (e) => {
+                item.classList.add("pressed");
+                if (clickSfx) { clickSfx.currentTime = 0; clickSfx.play().catch(()=>{}); }
+                if (item.id === "pitch-button") { e.preventDefault(); showToxicBubble(randomToxic()); return; }
+            });
+            
+            // 点击事件
+            item.addEventListener("mouseup", () => {
+                item.classList.remove("pressed");
+                const target = item.dataset.target;
+
+                // 4点钟的上课
+                if (target === "CLASS_INTERACTION") {
+                    startClass();
+                    return;
+                }
+
+                if (target && target !== "none" && item.id !== "pitch-button") {
+                    setTimeout(() => { window.location.href = target; }, 150);
+                }
+            });
+            item.addEventListener("mouseleave", () => item.classList.remove("pressed"));
+        });
+    });
+</script>
+</body>
+</html>

@@ -62,7 +62,7 @@
         .nav-back:hover { 
             opacity: 1;
             color: var(--color-mint);
-            text-shadow: 0 0 10px rgba(15, 253, 187, 0.8); /* 发光特效 */
+            text-shadow: 0 0 10px rgba(15, 253, 187, 0.8); /* 薄荷绿发光 */
         }
 
         .page-title-fixed {
@@ -73,9 +73,7 @@
             font-size: 14px;
             color: #666;
             font-family: 'PuHuiTi', sans-serif;
-            opacity: 0.8;
-            mix-blend-mode: difference;
-            color: white;
+            font-weight: bold;
         }
 
         /* =========================================
@@ -119,14 +117,28 @@
             max-width: 800px;
         }
 
-        /* 🔴 修改：项目标题去掉背景色，保持原样 */
+        /* 项目标题无背景，保持简洁 */
         .project-title {
             font-family: 'BebasNeue', sans-serif;
             font-size: 48px;
             color: #000;
             margin: 0 0 10px 0;
             letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
         }
+        
+        /* 标题前加个小点点缀 */
+        .project-title::before {
+            content: '';
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            transform: translateY(-5px);
+        }
+        .project-section:nth-of-type(odd) .project-title::before { background-color: var(--color-mint); }
+        .project-section:nth-of-type(even) .project-title::before { background-color: var(--color-pink); }
 
         .project-tags {
             font-family: 'InstrumentSans-Regular', sans-serif;
@@ -143,7 +155,7 @@
             color: #555;
         }
         
-        /* 交互提示带背景 */
+        /* 交互提示带背景 (粉/绿交替) */
         .interaction-tip {
             display: inline-block;
             padding: 4px 12px;
@@ -154,7 +166,6 @@
             opacity: 1;
             color: #000;
         }
-        /* 颜色与标题相反，形成对比 */
         .project-section:nth-of-type(odd) .interaction-tip {
             background-color: var(--color-mint);
         }
@@ -163,55 +174,74 @@
         }
 
         /* =========================================
-           Project 1: 短暂离席 (复古电视)
+           Project 1: 短暂离席 (复古电视 - 视频版)
            ========================================= */
         .tv-frame {
             position: relative;
             width: 100%;
-            max-width: 700px;
-            aspect-ratio: 4/3;
+            max-width: 854px; /* 匹配视频宽度 */
+            aspect-ratio: 16/9; /* 修正比例 */
             background: #e0e0e0; 
             border-radius: 30px;
             padding: 20px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.1);
             cursor: pointer;
             transition: transform 0.2s;
+            -webkit-tap-highlight-color: transparent; 
         }
         
-        .tv-frame:active {
-            transform: scale(0.99);
+        .tv-frame:hover {
+            transform: scale(1.01);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.15);
         }
 
         .tv-screen-container {
             width: 100%;
             height: 100%;
             background: #000;
-            border-radius: 20px;
+            border-radius: 10px;
             position: relative;
             overflow: hidden;
             border: 2px solid #ccc;
         }
 
-        .tv-screen {
+        /* 视频层 */
+        .tv-screen-video {
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
+            object-fit: cover; /* 保证铺满 */
             position: relative;
             z-index: 1;
+            display: block;
+            background: #000;
         }
 
+        /* 雪花遮罩 */
         .tv-static {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABZJREFUeNpi2r9//38gYGAEESAAEGAAasgJOgzOKCoAAAAASUVORK5CYII=');
             background-size: 4px 4px;
-            opacity: 1; 
+            opacity: 1; /* 默认可见 */
             transition: opacity 0.4s ease;
             z-index: 2;
             animation: static-noise 0.2s infinite steps(4);
             mix-blend-mode: overlay;
             background-color: #222;
+            pointer-events: none;
+        }
+
+        /* 播放按钮覆盖 */
+        .play-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            font-size: 40px;
+            color: rgba(255,255,255,0.8);
+            opacity: 0.8;
+            transition: opacity 0.3s;
+            pointer-events: none;
         }
 
         .scanlines {
@@ -219,7 +249,7 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
             background-size: 100% 4px;
-            z-index: 3;
+            z-index: 4;
             pointer-events: none;
         }
 
@@ -228,9 +258,9 @@
             100% { background-position: 100px 100px; }
         }
 
-        .tv-frame:active .tv-static {
-            opacity: 0;
-        }
+        /* 悬停时雪花变淡，显示视频 */
+        .tv-frame:hover .tv-static { opacity: 0.2; }
+        .tv-frame:hover .play-overlay { opacity: 0; }
 
         /* =========================================
            Project 2: 卡西尼环缝 (探测扫描)
@@ -326,6 +356,51 @@
             touch-action: none;
         }
 
+        /* =========================================
+           5. Lightbox (全屏视频)
+           ========================================= */
+        #lightbox {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.98);
+            z-index: 4000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #lightbox.active { display: flex; opacity: 1; }
+
+        .lightbox-video-container {
+            width: 80%;
+            max-width: 1000px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .lightbox-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .close-lightbox {
+            position: absolute;
+            top: 40px; right: 40px;
+            color: #000;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 5000;
+            transition: transform 0.2s;
+        }
+        .close-lightbox:hover { transform: scale(1.2) rotate(90deg); color: var(--color-pink); }
+
     </style>
 </head>
 <body>
@@ -349,14 +424,23 @@
                 <div class="project-desc">
                     物理空间互动装置。模拟千禧年家庭空间，利用摇椅下的压力传感器控制老电视的通电状态。
                 </div>
-                <span class="interaction-tip">按住电视屏幕模拟“坐下”</span>
+                <span class="interaction-tip">Hover Preview / Click Fullscreen</span>
             </div>
 
             <!-- 电视机容器 -->
             <div class="tv-frame" id="tv-box">
                 <div class="tv-screen-container">
-                    <div class="tv-screen" style="background-image: url('../assets/images/install-tv.png');"></div>
+                    <!-- 预览视频：静音 -->
+                    <video class="tv-screen-video" loop muted playsinline poster="https://placehold.co/854x480/111/EEE?text=Loading+Video">
+                        <!-- 🔴 路径 -->
+                        <source src="../assets/video/install-tv-mv.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <!-- 播放图标 -->
+                    <div class="play-overlay">▶</div>
+                    <!-- 雪花遮罩 -->
                     <div class="tv-static"></div>
+                    <!-- 扫描线 -->
                     <div class="scanlines"></div>
                 </div>
             </div>
@@ -384,7 +468,7 @@
         </section>
 
 
-        <!-- Project 3: DT 海报 (起雾交互) -->
+        <!-- Project 3: DT 海报 -->
         <section class="project-section">
             <div class="project-header">
                 <h2 class="project-title">Design Thinking</h2>
@@ -405,10 +489,66 @@
 
     </div>
 
+    <!-- Lightbox -->
+    <div id="lightbox">
+        <div class="close-lightbox">&times;</div>
+        <div class="lightbox-video-container">
+            <video id="lb-video" controls>
+                <source src="" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
     <script>
         /* =========================================
-           Project 1: TV 交互逻辑 (CSS Active)
+           Project 1: TV 交互逻辑 (悬停预览 + 点击全屏)
            ========================================= */
+        const tvBox = document.getElementById('tv-box');
+        const tvVideo = tvBox.querySelector('video');
+        const lightbox = document.getElementById('lightbox');
+        const lbVideo = document.getElementById('lb-video');
+        const closeBtn = document.querySelector('.close-lightbox');
+        const videoSrc = "../assets/video/install-tv-mv.mp4"; // 视频源
+
+        // 1. 悬停静音播放
+        tvBox.addEventListener('mouseenter', () => {
+            tvVideo.muted = true; // 确保静音
+            tvVideo.play().catch(()=>{});
+        });
+
+        // 2. 移开暂停
+        tvBox.addEventListener('mouseleave', () => {
+            tvVideo.pause();
+            tvVideo.currentTime = 0; // 重置进度
+        });
+
+        // 3. 点击打开灯箱 (有声)
+        tvBox.addEventListener('click', () => {
+            // 暂停预览
+            tvVideo.pause();
+            
+            // 设置灯箱源
+            lbVideo.src = videoSrc;
+            lightbox.classList.add('active');
+            
+            // 播放大视频 (取消静音)
+            lbVideo.muted = false;
+            lbVideo.volume = 1.0;
+            lbVideo.play().catch(()=>{});
+        });
+
+        // 关闭灯箱
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lbVideo.pause();
+            lbVideo.src = ""; // 清空源
+        }
+
+        closeBtn.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
         
         /* =========================================
            Project 2: 卡西尼扫描逻辑
@@ -450,9 +590,8 @@
             initFog();
         }
 
-        // 初始化雾气 (填充半透明白色)
+        // 初始化雾气 (乳白色)
         function initFog() {
-            // 🔴 修改：使用干净的乳白色
             ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -479,7 +618,7 @@
                 const rect = canvas.getBoundingClientRect();
                 scratch(e.clientX - rect.left, e.clientY - rect.top);
             }
-            // 移动即擦除，模拟哈气效果，更流畅
+            // 移动即擦除
             const rect = canvas.getBoundingClientRect();
             scratch(e.clientX - rect.left, e.clientY - rect.top);
         });
