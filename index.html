@@ -21,7 +21,6 @@
             font-family: 'BebasNeue';
             src: url('assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
         }
-        /* 新增：粉笔字体 (如果没有可用系统默认手写体代替) */
         @font-face {
             font-family: 'ChalkFont';
             src: local('Chalkboard SE'), local('Comic Sans MS'), sans-serif;
@@ -76,14 +75,14 @@
         }
 
         /* =========================================
-           3. LOADING 遮罩层样式 (保持不变)
+           3. LOADING 遮罩层样式
            ========================================= */
         #loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #fff;
-            z-index: 9999;
-            display: flex;
+            z-index: 9999; /* 最高层级，盖住一切 */
+            display: flex; /* 默认显示，JS控制隐藏 */
             justify-content: center;
             align-items: center;
             cursor: progress;
@@ -101,13 +100,26 @@
         .loading-footer { position: absolute; bottom: 40px; left: 40px; font-size: 12px; color: #666; }
         .loading-spinner { position: absolute; bottom: 40px; right: 40px; width: 30px; height: 30px; border: 4px solid #000; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* 疯癫特效 */
         .body-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) infinite both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        
+        /* 进入按钮 */
         .enter-btn-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; cursor: pointer; display: none; justify-content: center; align-items: center; }
         .click-hint { position: absolute; bottom: 20%; background: #000; color: #fff; padding: 10px 20px; font-size: 18px; font-weight: bold; transform: rotate(-5deg); animation: pulse 0.5s infinite alternate; }
         @keyframes pulse { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(-5deg) scale(1.1); } }
-        .overlay-explode { animation: explode-fade 0.8s forwards; pointer-events: none; }
-        @keyframes explode-fade { 0% { transform: scale(1); opacity: 1; filter: blur(0); } 50% { transform: scale(1.5); opacity: 0; filter: blur(10px); } 100% { transform: scale(2); opacity: 0; display: none; } }
+
+        /* 遮罩炸开动画 */
+        .overlay-explode {
+            animation: explode-fade 0.8s forwards;
+            pointer-events: none;
+        }
+        @keyframes explode-fade {
+            0% { transform: scale(1); opacity: 1; filter: blur(0); }
+            50% { transform: scale(1.5); opacity: 0; filter: blur(10px); }
+            100% { transform: scale(2); opacity: 0; display: none; }
+        }
 
         /* =========================================
            4. 主页其余样式 (保持不变)
@@ -186,11 +198,41 @@
         .item-11 .main-text { font-size: var(--font-size-large); line-height: 1.1; padding: 8px 6px; }
         .item-11 .sub-text { font-size: var(--font-size-tiny); opacity: 0.6; margin-top: 6px; }
 
-        .toxic-bubble { position: absolute; right: 120%; bottom: 50%; background: #fff; border: 3px solid #000; box-shadow: 4px 4px 0px rgba(0,0,0,1); padding: 8px 14px; border-radius: 8px; font-size: 16px; font-weight: 900; color: #000; white-space: normal; word-break: break-word; width: max-content; max-width: 260px; z-index: 1000; transform-origin: center center; animation: comic-barrage 2.5s ease-out forwards; pointer-events: none; }
-        @keyframes comic-barrage { 0% { opacity: 0; transform: translate(0, 20px) scale(0.5); } 10% { opacity: 1; transform: translate(0, 0) scale(1.1); } 20% { transform: translate(0, 0) scale(1); } 80% { opacity: 1; transform: translate(0, -80px) scale(1); } 100% { opacity: 0; transform: translate(0, -120px) scale(0.9); } }
+        /* 弹幕气泡样式 (修改版：去硬边，延长动画) */
+        .toxic-bubble {
+            position: absolute;
+            right: 120%; bottom: 50%;
+            background: #fff; 
+            border: 3px solid #000; 
+            /* 🔴 修改：使用柔和阴影替代硬边阴影 */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+            padding: 8px 14px; 
+            border-radius: 8px;
+            font-size: 16px; 
+            font-weight: 900; 
+            color: #000;
+            white-space: normal;
+            word-break: break-word;
+            width: max-content; 
+            max-width: 260px;
+            z-index: 1000; 
+            transform-origin: center center;
+            /* 🔴 修改：动画时长增加到 4s */
+            animation: comic-barrage 4s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes comic-barrage {
+            0% { opacity: 0; transform: translate(0, 20px) scale(0.5); }
+            10% { opacity: 1; transform: translate(0, 0) scale(1.1); }
+            20% { transform: translate(0, 0) scale(1); }
+            /* 🔴 修改：飘得更高，给足阅读时间 */
+            80% { opacity: 1; transform: translate(0, -150px) scale(1); }
+            100% { opacity: 0; transform: translate(0, -250px) scale(0.9); }
+        }
 
         /* =========================================
-           5. 神经质黑板 (Class Overlay)
+           5. 神经质白板 (Class Overlay)
            ========================================= */
         #class-overlay {
             position: fixed;
@@ -198,10 +240,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #2b303b; /* 黑板色 */
+            background-color: #f4f4f4; 
             z-index: 5000;
             transition: top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            cursor: none; /* 隐藏鼠标，用粉笔代替 */
+            cursor: none; /* 隐藏鼠标，用笔代替 */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -212,28 +254,27 @@
             top: 0;
         }
 
-        /* 粉笔光标 */
+        /* 笔光标 */
         .chalk-cursor {
             position: fixed;
-            width: 20px;
-            height: 20px;
-            background: #fff;
+            width: 15px;
+            height: 15px;
+            background: #000;
             border-radius: 50%;
             pointer-events: none;
             z-index: 5001;
-            mix-blend-mode: difference;
-            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
             display: none;
         }
 
-        /* 疯癫文字弹幕 */
+        /* 疯癫文字弹幕 (彩色版) */
         .crazy-text {
             position: absolute;
-            font-family: 'ChalkFont', cursive;
-            color: rgba(255,255,255,0.8);
-            font-weight: bold;
+            font-family: 'InstrumentSans-Regular', sans-serif; /* 现代字体 */
+            font-weight: 900; /* 加粗 */
             pointer-events: none;
             white-space: nowrap;
+            color: #000; 
             animation: jitter 0.2s infinite;
         }
 
@@ -245,7 +286,7 @@
             100% { transform: translate(0, 0) rotate(0deg); }
         }
 
-        /* 黑板上的涂鸦画布 */
+        /* 画布 */
         #scribble-canvas {
             position: absolute;
             top: 0;
@@ -260,7 +301,7 @@
             bottom: 30px;
             font-family: 'BebasNeue', sans-serif;
             font-size: 32px;
-            color: rgba(255,255,255,0.3);
+            color: rgba(0,0,0,0.2); 
             pointer-events: none;
         }
 
@@ -294,7 +335,7 @@
     </div>
 </div>
 
-<!-- CLASSROOM OVERLAY (神经质黑板) -->
+<!-- CLASSROOM OVERLAY (神经质白板) -->
 <div id="class-overlay">
     <canvas id="scribble-canvas"></canvas>
     <div class="chalk-cursor" id="chalk-cursor"></div>
@@ -349,10 +390,10 @@
     <div class="clock-item item-12" data-angle="0" data-target="pages/assistant.html">
         <div class="click-layer"><div class="overtime-wrapper"><span class="label bg-pink">加班</span><div class="sub-icons"><img src="assets/images/icons/canvas.svg"><img src="assets/images/icons/ai.svg"></div></div></div>
     </div>
-    <div class="clock-item item-2" data-angle="45" data-target="comics.html"><div class="click-layer"><span class="label bg-gray">改稿</span></div></div>
+    <div class="clock-item item-2" data-angle="45" data-target="pages/comics.html"><div class="click-layer"><span class="label bg-gray">改稿</span></div></div>
     <div class="clock-item item-3" data-angle="70" data-target="pages/games.html"><div class="click-layer"><div class="software-block"><img src="assets/images/icons/unity.svg" class="icon"><span class="software-label bg-pink">Unity</span></div></div></div>
     
-    <!-- 4点: 上课 (Modified) -->
+    <!-- 4点: 上课 -->
     <div class="clock-item item-4" data-angle="105" data-target="CLASS_INTERACTION">
         <div class="click-layer"><span class="label bg-mint">上课</span><span class="sub">ATTEND CLASS</span></div>
     </div>
@@ -372,14 +413,13 @@
 <audio id="sfx-moo" src="assets/audio/moo.mp3" preload="auto"></audio>
 <audio id="sfx-glitch" src="assets/audio/glitch.mp3" preload="auto"></audio>
 <audio id="sfx-explode" src="assets/audio/explode.mp3" preload="auto"></audio>
-<!-- 新增：粉笔音效 -->
 <audio id="sfx-chalk" src="assets/audio/chalk.mp3" preload="auto"></audio>
 <audio id="sfx-bell" src="assets/audio/bell.mp3" preload="auto"></audio>
 
 <!-- JS 逻辑 -->
 <script>
     /* -------------------------------------
-       0. 黑板交互逻辑 (Class Overlay)
+       0. 白板交互逻辑 (Class Overlay)
        ------------------------------------- */
     const classOverlay = document.getElementById('class-overlay');
     const chalkCursor = document.getElementById('chalk-cursor');
@@ -397,7 +437,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // 激活黑板
+    // 激活白板
     function startClass() {
         isClassActive = true;
         classOverlay.classList.add('active');
@@ -414,7 +454,7 @@
         generateCrazyText();
     }
 
-    // 退出黑板
+    // 退出白板
     function endClass() {
         if(!isClassActive) return;
         isClassActive = false;
@@ -427,7 +467,7 @@
         // 播放下课铃
         if(sfxBell) sfxBell.play().catch(()=>{});
 
-        // 收起黑板
+        // 收起白板
         classOverlay.classList.remove('active');
         chalkCursor.style.display = 'none';
         
@@ -438,42 +478,44 @@
         }, 500);
     }
 
-    // 鼠标绘画
+    // 鼠标绘画 (黑色笔触)
     classOverlay.addEventListener('mousemove', (e) => {
-        chalkCursor.style.left = e.clientX - 10 + 'px';
-        chalkCursor.style.top = e.clientY - 10 + 'px';
+        chalkCursor.style.left = e.clientX - 7 + 'px';
+        chalkCursor.style.top = e.clientY - 7 + 'px';
 
         if(isClassActive && Math.random() > 0.5) {
             ctx.beginPath();
             ctx.arc(e.clientX, e.clientY, 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fillStyle = 'rgba(0,0,0,0.8)'; // 黑色涂鸦
             ctx.fill();
         }
     });
 
-    // 点击退出
     classOverlay.addEventListener('click', endClass);
 
-    // 自动弹幕生成器
+    // 自动弹幕生成器 (彩色)
     function generateCrazyText() {
         if(!isClassActive) return;
         
-        const texts = ["听不懂", "???", "GPA", "想睡觉", "别念了", "Deadline", "Zzz...", "Help", "🤯"];
+        const texts = ["听不懂", "???", "GPA", "想睡觉", "别念了", "Deadline", "Zzz...", "Help", "🤯", "🆘"];
+        const colors = ['#000', '#f9a7e3', '#0ffdbb']; // 黑/粉/绿
+        
         const el = document.createElement('div');
         el.classList.add('crazy-text');
         el.innerText = texts[Math.floor(Math.random() * texts.length)];
+        el.style.color = colors[Math.floor(Math.random() * colors.length)];
         
         const x = Math.random() * window.innerWidth;
         const y = Math.random() * window.innerHeight;
         el.style.left = x + 'px';
         el.style.top = y + 'px';
-        el.style.fontSize = (20 + Math.random() * 50) + 'px';
+        el.style.fontSize = (20 + Math.random() * 60) + 'px';
         el.style.transform = `rotate(${Math.random()*60-30}deg)`;
         
         classOverlay.appendChild(el);
         
         // 继续生成
-        setTimeout(generateCrazyText, 200);
+        setTimeout(generateCrazyText, 150);
     }
 
 
@@ -553,7 +595,7 @@
     const toxicLines = [
         "你听不懂人话吗？", "你在干什么？", "那不就相当于什么都没做吗？",
         "好丑", "好土啊，你的方案活在二十年前", "准备熬夜吧", "ESP32太好用了", 
-        "从今天开始Arduino是路边的狗", "只需Gemini3略微出手", "我要那种五彩斑斓的黑",
+        "从今天开始Arduino是路边的狗", "只需Gemini3略微出手", "发出了像牛又像马的嘶鸣",
         "字间距再调一下...算了改回去吧", "那我的钱怎么像袅一样溜走了", 
         "做游戏能让一个人的外貌焕然一新", "预算只有五百", "周四前能给吗？",
         "我只是一只鸟啊为什么这么多ddl要赶", "讲座海报的人像一定要大！", 
@@ -582,7 +624,8 @@
         bubble.style.right = `calc(120% + ${offsetX}px)`;
         bubble.style.bottom = `calc(50% + ${offsetY}px)`;
         container.appendChild(bubble);
-        setTimeout(() => { bubble.remove(); }, 2600);
+        // 🔴 修改：弹幕显示 4.1 秒后消失 (匹配动画 4s)
+        setTimeout(() => { bubble.remove(); }, 4100);
     }
 
     const CLOCK_SPEED = 30; 
@@ -690,7 +733,7 @@
                 item.classList.remove("pressed");
                 const target = item.dataset.target;
 
-                // 🔴 特殊处理：4点钟的上课
+                // 4点钟的上课
                 if (target === "CLASS_INTERACTION") {
                     startClass();
                     return;

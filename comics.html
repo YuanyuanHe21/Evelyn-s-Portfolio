@@ -9,6 +9,7 @@
         /* =========================================
            1. 字体与基础设置
            ========================================= */
+        /* 路径修改：位于根目录，直接引用 assets */
         @font-face {
             font-family: 'InstrumentSans-Regular';
             src: url('assets/fonts/InstrumentSans-Regular.ttf') format('truetype');
@@ -22,10 +23,17 @@
             src: url('assets/fonts/BebasNeueRegular-gxj83.ttf') format('truetype');
         }
 
+        :root {
+            /* 核心品牌色 - 仅用于进度条 */
+            --color-pink: #f9a7e3;      
+            --color-mint: #0ffdbb;
+            --bg-color: #f4f4f4;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0; /* 浅灰底色 */
+            background-color: var(--bg-color);
             font-family: 'InstrumentSans-Regular', 'PuHuiTi', sans-serif;
             overflow: hidden; /* 隐藏原生滚动条 */
             height: 100vh;
@@ -39,7 +47,7 @@
         }
 
         /* =========================================
-           2. 导航 UI
+           2. 导航 UI (柔光版)
            ========================================= */
         .nav-back {
             position: fixed;
@@ -49,16 +57,20 @@
             text-decoration: none;
             font-size: 18px;
             font-weight: bold;
-            mix-blend-mode: difference;
-            color: white; 
+            color: #000; 
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: opacity 0.3s;
-        }
-        .nav-back:hover {
             opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        /* 粉色悬停 + 黑色硬阴影 */
+        .nav-back:hover {
+            opacity: 1;
+            color: var(--color-pink);
+            text-shadow: 0 0 10px rgba(249, 167, 227, 0.8);
         }
 
         .page-indicator {
@@ -71,6 +83,19 @@
             color: #888;
             font-family: 'InstrumentSans-Regular', sans-serif;
             letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 扁平化荧光笔风格，去掉了黑色硬阴影 */
+        #current-index {
+            font-weight: bold;
+            color: #000;
+            background-color: var(--color-mint);
+            padding: 2px 10px;
+            font-size: 16px;
+            border-radius: 4px; /* 稍微圆润一点，呼应主页标签 */
         }
 
         .scroll-hint {
@@ -81,9 +106,10 @@
             font-size: 14px;
             color: #000;
             opacity: 0.4;
+            font-weight: bold;
         }
 
-        /* 新增：左下角课程说明 */
+        /* 🔴 修改：恢复为初始灰色字体，去掉粉色背景 */
         .project-intro {
             position: fixed;
             bottom: 40px;
@@ -124,9 +150,9 @@
             flex-shrink: 0;
             height: 70vh; 
             width: auto;  
-            border-radius: 4px;
+            border: none;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); /* 更柔和的投影 */
             transition: transform 0.1s; 
             background: #fff;
         }
@@ -138,14 +164,14 @@
             pointer-events: none; 
         }
 
-        /* 漫画编号 */
+        /* 漫画编号为浅灰色 */
         .comic-number {
             position: absolute;
             top: -40px;
             left: 0;
             font-size: 120px;
             font-family: 'BebasNeue', sans-serif;
-            color: rgba(0,0,0,0.05);
+            color: rgba(0,0,0,0.05); /* 保持浅灰 */
             line-height: 1;
             z-index: -1;
         }
@@ -157,24 +183,34 @@
             left: 0;
             width: 100%;
         }
+        
+        /* 标题样式：扁平高亮 */
         .comic-title {
+            display: inline-block;
             font-size: 18px;
             font-weight: bold;
-            color: #333;
+            color: #000;
+            background-color: var(--color-mint);
+            padding: 4px 10px;
+            border-radius: 2px;
         }
+        
         .comic-desc {
-            font-size: 14px;
-            color: #888;
+            font-size: 12px;
+            color: #666;
             margin-top: 5px;
+            font-family: 'InstrumentSans-Regular', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* 进度条 */
+        /* 进度条：粉绿渐变 */
         .progress-bar {
             position: fixed;
             bottom: 0;
             left: 0;
-            height: 4px;
-            background: #000;
+            height: 6px;
+            background: linear-gradient(90deg, var(--color-pink), var(--color-mint));
             width: 0%; 
             z-index: 200;
             transition: width 0.1s linear;
@@ -202,14 +238,14 @@
 
     <!-- 5. 课程说明 (左下) -->
     <div class="project-intro">
-        专业选修:视觉叙事
+        专业选修: 视觉叙事
     </div>
 
     <!-- 6. 画廊主体 -->
     <div class="gallery-viewport">
         <div class="gallery-track" id="track">
             
-            <!-- 漫画 Item 1 -->
+            <!-- Item 1 -->
             <div class="comic-item">
                 <span class="comic-number">01</span>
                 <img src="assets/images/comic-01.PNG" alt="Comic 1" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+01'">
@@ -219,7 +255,7 @@
                 </div>
             </div>
 
-            <!-- 漫画 Item 2 -->
+            <!-- Item 2 -->
             <div class="comic-item">
                 <span class="comic-number">02</span>
                 <img src="assets/images/comic-02.PNG" alt="Comic 2" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+02'">
@@ -228,7 +264,7 @@
                 </div>
             </div>
 
-            <!-- 漫画 Item 3 -->
+            <!-- Item 3 -->
             <div class="comic-item">
                 <span class="comic-number">03</span>
                 <img src="assets/images/comic-03.PNG" alt="Comic 3" onerror="this.src='https://placehold.co/900x700/EEE/31343C?text=COMIC+PAGE+03'">
@@ -237,7 +273,7 @@
                 </div>
             </div>
 
-            <!-- 漫画 Item 4 -->
+            <!-- Item 4 -->
             <div class="comic-item">
                 <span class="comic-number">04</span>
                 <img src="assets/images/comic-04.PNG" alt="Comic 4" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+04'">
@@ -246,7 +282,7 @@
                 </div>
             </div>
 
-            <!-- 漫画 Item 5 -->
+            <!-- Item 5 -->
             <div class="comic-item">
                 <span class="comic-number">05</span>
                 <img src="assets/images/comic-05.PNG" alt="Comic 5" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+05'">
@@ -255,7 +291,7 @@
                 </div>
             </div>
 
-            <!-- 漫画 Item 6 -->
+            <!-- Item 6 -->
             <div class="comic-item">
                 <span class="comic-number">06</span>
                 <img src="assets/images/comic-06.PNG" alt="Comic 6" onerror="this.src='https://placehold.co/500x700/EEE/31343C?text=COMIC+PAGE+06'">
